@@ -1,4 +1,5 @@
-import webbrowser
+import requests
+from aiohttp import web
 
 class SlackCallbacks:
 
@@ -8,8 +9,10 @@ class SlackCallbacks:
     def send_message(self):
         pass
 
-    def open_ifmo(self):
-        webbrowser.open('http://ifmo.su')
+    async def open_ifmo(self):
+        r = requests.get('http://ifmo.su')
+        return web.Response(text=r.text)
+
 
     def say_hello(self):
         print("hello")
