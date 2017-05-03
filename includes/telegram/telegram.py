@@ -24,9 +24,10 @@ class Telegram:
         data = await request.text()
         update = json.loads(data)
 
-    def run(self, server, api):
-        """
-        Make all stuff. For example, initialize process. Or just nothing.
-        :return:
-        """
-        server.router.add_post('/telegram/callback', self.telegram_callback)
+    def get_routes(self):
+        return [
+            ('GET', '/telegram/callbacks/', self.telegram_callback)
+        ]
+
+    def run(self):
+        pass

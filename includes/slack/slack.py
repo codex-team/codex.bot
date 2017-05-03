@@ -2,6 +2,7 @@ import json
 import logging
 from .callbacks import SlackCallbacks
 
+
 class Slack:
 
     __name__ = "Slack"
@@ -14,9 +15,8 @@ class Slack:
 
     def get_routes(self):
         return [
-                   ('GET', '/slack/say_hello', SlackCallbacks.say_hello),
-                   ('POST', '/slack/say_bye', SlackCallbacks.say_bye),
-                   ('GET', '/slack/open_ifmo', SlackCallbacks.open_ifmo)
+            ('GET', '/slack/say_hello', SlackCallbacks.say_hello),
+            ('POST', '/slack/say_bye', SlackCallbacks.say_bye),
         ]
 
     def run(self):

@@ -50,8 +50,10 @@ class Core:
 
                 self.modules[name] = current_module.module_obj
 
-                for route in current_module.module_obj.get_routes():
-                    self.server.router.add_route(*route)
+                # getting module route and use Core decorator
+                # see set_routes
+                module_routes = current_module.module_obj.get_routes()
+                self.set_routes(module_routes)
 
                 current_module.module_obj.run(self.server, self.api)
 
@@ -59,6 +61,10 @@ class Core:
                 logging.error(e)
 
         logging.debug("{} modules loaded.".format(len(self.modules)))
+
+    def set_routes(self, routes):
+        for route in routes:
+            self.server.router.add_route(*route)
 
     def send(self, message, queue_name, host='localhost'):
         yield from send_message_v3(message, queue_name)
