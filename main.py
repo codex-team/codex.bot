@@ -49,6 +49,10 @@ class Core:
                     raise Exception("Module {} is already registered.".format(name))
 
                 self.modules[name] = current_module.module_obj
+
+                for route in current_module.module_obj.get_routes():
+                    self.server.router.add_route(*route)
+
                 current_module.module_obj.run(self.server, self.api)
 
             except Exception as e:
@@ -58,7 +62,6 @@ class Core:
 
     def send(self, message, queue_name, host='localhost'):
         yield from send_message_v3(message, queue_name)
-
 
 # TODO1: static methods
 # TODO2: logging setup

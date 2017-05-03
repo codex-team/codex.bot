@@ -12,7 +12,12 @@ class Slack:
     def register_api_command(self):
         return []
 
-    def run(self, server, api):
-        server.router.add_get('/slack/say_hello', SlackCallbacks.say_hello)
-        server.router.add_post('/slack/say_bye', SlackCallbacks.say_bye)
-        server.router.add_get('/slack/open_ifmo', SlackCallbacks.open_ifmo)
+    def get_routes(self):
+        return [
+                   ('GET', '/slack/say_hello', SlackCallbacks.say_hello),
+                   ('POST', '/slack/say_bye', SlackCallbacks.say_bye),
+                   ('GET', '/slack/open_ifmo', SlackCallbacks.open_ifmo)
+        ]
+
+    def run(self):
+        pass
