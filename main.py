@@ -27,7 +27,7 @@ class Core:
         self.api.start()
 
     def init_server(self):
-        self.server = Server(self.event_loop, self.config.server()['host'], self.config.server()['port'])
+        self.server = Server(self.event_loop, *self.config.server())
 
     def init_api(self):
         self.api = Api(self, self.event_loop)

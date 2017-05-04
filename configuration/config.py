@@ -11,7 +11,7 @@ class Config:
         self.__url = URL
 
     def server(self):
-        return self.__server
+        return self.__server['host'], self.__server['port']
 
     def rabbitmq(self):
         return self.__rabbitmq
