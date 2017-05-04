@@ -1,45 +1,42 @@
 import asyncio
 import importlib
-import os
-from aiohttp import web
 import logging
+import os
 
 from api.api import Api
-from lib.rabbitmq import init_receiver_v3, send_message_v3
-
+from lib.logging import Logging
+from lib.server import Server
+from configuration.config import Config
 
 class Core:
 
     def __init__(self):
         self.modules = {}
 
-        self.init_logging()
+        self.logging = Logging()
+        self.config = Config()
         self.event_loop = asyncio.get_event_loop()
-        self.api = Api(self)
+        self.init_api()
         self.init_server()
         self.init_queue()
         self.init_modules()
-        web.run_app(self.server, host='localhost', port=1337)
-
-    def init_logging(self):
-        logging.getLogger('asyncio').setLevel(logging.DEBUG)
-        format_str = "[%(filename)s:%(lineno)s - %(funcName)s() ] %(message)s"
-        logging.basicConfig(level=logging.DEBUG, format=format_str)
-        logging.debug("Logging initiated.")
+        self.server.start()
 
     def init_queue(self):
-        logging.debug("Initiate event loop.")
-        self.event_loop.run_until_complete(init_receiver_v3(self.api.callback, "core"))
+        logging.debug("Initiate queue and loop.")
+        self.api.start()
 
     def init_server(self):
-        self.server = web.Application(loop=self.event_loop)
+        self.server = Server(self.event_loop, *self.config.server())
+
+    def init_api(self):
+        self.api = Api(self, self.event_loop)
 
     def init_modules(self):
         """
         Collects core modules from subdirectories
         :return:
         """
-
         for module in filter(lambda x: not x.startswith('__'), os.listdir('includes')):
             try:
                 current_module = importlib.import_module("includes.{}".format(module))
@@ -66,10 +63,6 @@ class Core:
     def set_routes(self, routes):
         for route in routes:
             self.server.router.add_route(*route)
-
-    def send(self, message, queue_name, host='localhost'):
-        yield from send_message_v3(message, queue_name)
-
 
 # TODO1: static methods
 # TODO2: logging setup

@@ -1,28 +1,24 @@
-import json
 import logging
 
+from lib.server import http_response
+from .config import TelegramConfig
 
 class Telegram:
 
     __name__ = "Telegram"
 
     def __init__(self):
+        self.config = TelegramConfig()
         logging.debug("Telegram module initiated.")
 
-    def register_api_commands(self):
-        """
-        Register api commands to route.
-        :return: list()
-        """
-        return []
-
-    async def telegram_callback(self, request):
+    @http_response
+    def telegram_callback(self, text, post, json):
         """
         Process messages from telegram bot
         :return:
         """
-        data = await request.text()
-        update = json.loads(data)
+        logging.info("Got telegram callback {} {} {}".format(text, post, json))
+        return True
 
     def get_routes(self):
         return [
