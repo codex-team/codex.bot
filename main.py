@@ -6,7 +6,7 @@ import os
 from api.api import Api
 from lib.logging import Logging
 from lib.server import Server
-
+from configuration.config import Config
 
 class Core:
 
@@ -14,6 +14,7 @@ class Core:
         self.modules = {}
 
         self.logging = Logging()
+        self.config = Config()
         self.event_loop = asyncio.get_event_loop()
         self.init_api()
         self.init_server()
@@ -26,7 +27,7 @@ class Core:
         self.api.start()
 
     def init_server(self):
-        self.server = Server(self.event_loop)
+        self.server = Server(self.event_loop, self.config.server()['host'], self.config.server()['port'])
 
     def init_api(self):
         self.api = Api(self, self.event_loop)
