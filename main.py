@@ -4,7 +4,7 @@ import logging
 import os
 
 from api.api import Api
-from lib.rabbitmq import init_receiver_v3, send_message_v3
+from lib.logging import Logging
 from lib.server import Server
 
 
@@ -13,19 +13,13 @@ class Core:
     def __init__(self):
         self.modules = {}
 
-        self.init_logging()
+        self.logging = Logging()
         self.event_loop = asyncio.get_event_loop()
         self.init_api()
         self.init_server()
         self.init_queue()
         self.init_modules()
         self.server.start()
-
-    def init_logging(self):
-        logging.getLogger('asyncio').setLevel(logging.DEBUG)
-        format_str = "[%(filename)s:%(lineno)s - %(funcName)s() ] %(message)s"
-        logging.basicConfig(level=logging.DEBUG, format=format_str)
-        logging.debug("Logging initiated.")
 
     def init_queue(self):
         logging.debug("Initiate queue and loop.")
