@@ -6,3 +6,6 @@ BOT_NAME = '@yourbot'
 
 # Telegram bot api token. You can get it from @BotFather
 API_TOKEN = ''
+
+# URL to Telegram's bot API
+API_URL = 'https://api.telegram.org/bot'
