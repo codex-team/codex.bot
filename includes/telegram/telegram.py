@@ -1,5 +1,6 @@
-import json
 import logging
+
+from lib.server import http_response
 
 
 class Telegram:
@@ -9,24 +10,23 @@ class Telegram:
     def __init__(self):
         logging.debug("Telegram module initiated.")
 
-    def register_api_commands(self):
-        """
-        Register api commands to route.
-        :return: list()
-        """
-        return []
-
-    async def telegram_callback(self, request):
+    @http_response
+    def telegram_callback(self, text, post, json):
         """
         Process messages from telegram bot
         :return:
         """
-        data = await request.text()
-        update = json.loads(data)
+        logging.info("Got telegram callback {} {} {}".format(text, post, json))
+        return True
 
     def run(self, server, api):
         """
         Make all stuff. For example, initialize process. Or just nothing.
         :return:
         """
-        server.router.add_post('/telegram/callback', self.telegram_callback)
+        self.server = server
+        self.api = api
+        routes = [
+            ('POST', '/telegram/callback', self.telegram_callback)
+        ]
+        self.server.set_routes(routes)

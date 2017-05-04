@@ -3,12 +3,15 @@ import logging
 
 import asyncio
 
+from lib.rabbitmq import send_message_v3, init_receiver_v3
+
 
 class Api:
 
-    def __init__(self, core):
+    def __init__(self, core, event_loop):
         logging.info("Api started.")
         self.core = core
+        self.event_loop = event_loop
 
     @asyncio.coroutine
     def callback(self, channel, body, envelope, properties):
@@ -20,9 +23,9 @@ class Api:
             version = message['api']
             incoming_queue = message['queue']
 
-            if not version == "v1":
+            if not version == "v1.1":
                 logging.debug("Try to send")
-                yield from self.core.send("{'result': 'Version invalid'}", incoming_queue)
+                yield from self.send("{'result': 'Version invalid'}", incoming_queue)
 
             # TODO: Parse message
             """
@@ -33,3 +36,8 @@ class Api:
         except Exception as e:
             logging.error(e)
 
+    def send(self, message, queue_name, host='localhost'):
+        yield from send_message_v3(message, queue_name)
+
+    def start(self):
+        self.event_loop.run_until_complete(init_receiver_v3(self.callback, "core"))

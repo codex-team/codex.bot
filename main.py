@@ -1,11 +1,11 @@
 import asyncio
 import importlib
-import os
-from aiohttp import web
 import logging
+import os
 
 from api.api import Api
 from lib.rabbitmq import init_receiver_v3, send_message_v3
+from lib.server import Server
 
 
 class Core:
@@ -15,11 +15,11 @@ class Core:
 
         self.init_logging()
         self.event_loop = asyncio.get_event_loop()
-        self.api = Api(self)
+        self.init_api()
         self.init_server()
         self.init_queue()
         self.init_modules()
-        web.run_app(self.server, host='localhost', port=1337)
+        self.server.start()
 
     def init_logging(self):
         logging.getLogger('asyncio').setLevel(logging.DEBUG)
@@ -28,18 +28,20 @@ class Core:
         logging.debug("Logging initiated.")
 
     def init_queue(self):
-        logging.debug("Initiate event loop.")
-        self.event_loop.run_until_complete(init_receiver_v3(self.api.callback, "core"))
+        logging.debug("Initiate queue and loop.")
+        self.api.start()
 
     def init_server(self):
-        self.server = web.Application(loop=self.event_loop)
+        self.server = Server(self.event_loop)
+
+    def init_api(self):
+        self.api = Api(self, self.event_loop)
 
     def init_modules(self):
         """
         Collects core modules from subdirectories
         :return:
         """
-
         for module in filter(lambda x: not x.startswith('__'), os.listdir('includes')):
             try:
                 current_module = importlib.import_module("includes.{}".format(module))
@@ -55,9 +57,6 @@ class Core:
                 logging.error(e)
 
         logging.debug("{} modules loaded.".format(len(self.modules)))
-
-    def send(self, message, queue_name, host='localhost'):
-        yield from send_message_v3(message, queue_name)
 
 
 # TODO1: static methods
