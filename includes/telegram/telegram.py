@@ -1,13 +1,14 @@
 import logging
 
 from lib.server import http_response
-
+from .config import TelegramConfig
 
 class Telegram:
 
     __name__ = "Telegram"
 
     def __init__(self):
+        self.config = TelegramConfig()
         logging.debug("Telegram module initiated.")
 
     @http_response
@@ -27,6 +28,6 @@ class Telegram:
         self.server = server
         self.api = api
         routes = [
-            ('POST', '/telegram/callback', self.telegram_callback)
+            ('POST', self.config.callback_route(), self.telegram_callback)
         ]
         self.server.set_routes(routes)

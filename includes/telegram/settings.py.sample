@@ -1,0 +1,8 @@
+# Route for telegram callbacks. Should starts with /
+CALLBACK_ROUTE = '/telegram/callback'
+
+# Telegram bot name
+BOT_NAME = '@yourbot'
+
+# Telegram bot api token. You can get it from @BotFather
+API_TOKEN = ''
