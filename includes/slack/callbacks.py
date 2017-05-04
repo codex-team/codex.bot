@@ -1,7 +1,3 @@
-import requests
-from aiohttp import web
-
-
 class SlackCallbacks:
 
     def __init__(self):

@@ -62,12 +62,14 @@ class Core:
 
         logging.debug("{} modules loaded.".format(len(self.modules)))
 
+    # aiohttp server routes decorator
     def set_routes(self, routes):
         for route in routes:
             self.server.router.add_route(*route)
 
     def send(self, message, queue_name, host='localhost'):
         yield from send_message_v3(message, queue_name)
+
 
 # TODO1: static methods
 # TODO2: logging setup

@@ -32,5 +32,3 @@ class Api:
 
         except Exception as e:
             logging.error(e)
-
-
