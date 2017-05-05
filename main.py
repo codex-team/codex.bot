@@ -46,7 +46,12 @@ class Core:
                     raise Exception("Module {} is already registered.".format(name))
 
                 self.modules[name] = current_module.module_obj
-                current_module.module_obj.run(self.server, self.api)
+                current_module.module_obj.run(self.api)
+
+                try:
+                    self.server.set_routes(current_module.module_obj.get_routes)
+                except Exception as e:
+                    logging.error(e)
 
             except Exception as e:
                 logging.error(e)

@@ -24,17 +24,12 @@ class Telegram:
         logging.info("Got telegram callback {} {} {}".format(text, post, json))
         return True
 
-    def run(self, server, api):
+    def run(self, api):
         """
         Make all stuff. For example, initialize process. Or just nothing.
         :return:
         """
-        self.server = server
         self.api = api
-        routes = [
-            ('POST', self.config.callback_route(), self.telegram_callback)
-        ]
-        self.server.set_routes(routes)
         self.set_webhook()
 
     def set_webhook(self):
@@ -81,3 +76,9 @@ class Telegram:
             logging.debug("Error while sending photo to Telegram: {}".format(response.content))
 
         return response
+
+    def get_routes(self):
+        routes = [
+            ('POST', self.config.callback_route(), self.telegram_callback)
+        ]
+        return routes
