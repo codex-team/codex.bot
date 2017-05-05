@@ -2,3 +2,4 @@
 .idea
 venv
 **/config.py
+configuration/globalcfg.py

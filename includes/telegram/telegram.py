@@ -3,7 +3,7 @@ import requests
 from urllib.parse import urlencode
 from lib.server import http_response
 
-from configuration.config import URL
+from configuration.globalcfg import URL
 from .config import BOT_NAME, API_TOKEN, API_URL, CALLBACK_ROUTE
 
 

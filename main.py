@@ -6,7 +6,7 @@ import os
 from api.api import Api
 from lib.logging import Logging
 from lib.server import Server
-from configuration.config import SERVER
+from configuration.globalcfg import SERVER
 
 class Core:
 
