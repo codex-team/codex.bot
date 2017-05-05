@@ -11,7 +11,7 @@ from .config import BOT_NAME, API_TOKEN, API_URL, CALLBACK_ROUTE
 class Telegram:
 
     __name__ = "Telegram"
-    self.routes = [
+    routes = [
         ('POST', self.config.callback_route(), self.telegram_callback)
     ]
 

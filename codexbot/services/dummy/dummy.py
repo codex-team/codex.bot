@@ -4,7 +4,7 @@ import logging
 class Dummy:
 
     __name__ = "Dummy"
-    self.routes = []
+    routes = []
 
     def __init__(self):
         logging.debug("Dummy module initiated.")
