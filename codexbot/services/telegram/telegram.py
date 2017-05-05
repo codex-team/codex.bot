@@ -1,9 +1,10 @@
 import logging
-import requests
 from urllib.parse import urlencode
-from lib.server import http_response
 
-from configuration.globalcfg import URL
+import requests
+
+from codexbot.globalcfg import URL
+from codexbot.lib.server import http_response
 from .config import BOT_NAME, API_TOKEN, API_URL, CALLBACK_ROUTE
 
 
@@ -30,13 +31,13 @@ class Telegram:
         logging.info("Got telegram callback {} {} {}".format(text, post, json))
         return True
 
-    def run(self, server, api):
+    def run(self, server, broker):
         """
         Make all stuff. For example, initialize process. Or just nothing.
         :return:
         """
         self.server = server
-        self.api = api
+        self.broker = broker
         routes = [
             ('POST', self.__callback_route, self.telegram_callback)
         ]

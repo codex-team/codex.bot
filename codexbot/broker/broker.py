@@ -1,15 +1,14 @@
+import asyncio
 import json
 import logging
 
-import asyncio
-
-from lib.rabbitmq import send_message_v3, init_receiver_v3
+from codexbot.lib.rabbitmq import send_message_v3, init_receiver_v3
 
 
-class Api:
+class Broker:
 
     def __init__(self, core, event_loop):
-        logging.info("Api started.")
+        logging.info("Broker started ;)")
         self.core = core
         self.event_loop = event_loop
 
@@ -20,7 +19,7 @@ class Api:
             message = json.loads(body)
             command = message['cmd']
             payload = message['payload']
-            version = message['api']
+            version = message['broker']
             incoming_queue = message['queue']
 
             if not version == "v1.1":
