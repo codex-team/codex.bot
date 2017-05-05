@@ -11,9 +11,7 @@ from .config import BOT_NAME, API_TOKEN, API_URL, CALLBACK_ROUTE
 class Telegram:
 
     __name__ = "Telegram"
-    routes = [
-        ('POST', self.config.callback_route(), self.telegram_callback)
-    ]
+    routes = []
 
     def __init__(self):
         self.__token = API_TOKEN
@@ -22,6 +20,7 @@ class Telegram:
         self.__callback_route = CALLBACK_ROUTE
 
         self.__bot_name = BOT_NAME
+        self.get_routes()
 
         logging.debug("Telegram module initiated.")
 
@@ -86,3 +85,8 @@ class Telegram:
             logging.debug("Error while sending photo to Telegram: {}".format(response.content))
 
         return response
+
+    def get_routes(self):
+        self.routes = [
+            ('POST', CALLBACK_ROUTE, self.telegram_callback)
+        ]

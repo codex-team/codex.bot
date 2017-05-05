@@ -47,7 +47,7 @@ class Core:
 
                 self.modules[name] = current_module.module_obj
 
-                current_module.module_obj.run(self.server, self.broker)
+                current_module.module_obj.run(self.broker)
 
                 try:
                     self.server.set_routes(current_module.module_obj.routes)
