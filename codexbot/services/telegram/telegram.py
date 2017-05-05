@@ -11,6 +11,9 @@ from .config import BOT_NAME, API_TOKEN, API_URL, CALLBACK_ROUTE
 class Telegram:
 
     __name__ = "Telegram"
+    self.routes = [
+        ('POST', self.config.callback_route(), self.telegram_callback)
+    ]
 
     def __init__(self):
         self.__token = API_TOKEN
@@ -31,12 +34,12 @@ class Telegram:
         logging.info("Got telegram callback {} {} {}".format(text, post, json))
         return True
 
-    def run(self, api):
+    def run(self, broker):
         """
         Make all stuff. For example, initialize process. Or just nothing.
         :return:
         """
-        self.api = api
+        self.broker = broker
         self.set_webhook()
 
     def set_webhook(self):
@@ -83,9 +86,3 @@ class Telegram:
             logging.debug("Error while sending photo to Telegram: {}".format(response.content))
 
         return response
-
-    def get_routes(self):
-        routes = [
-            ('POST', self.config.callback_route(), self.telegram_callback)
-        ]
-        return routes

@@ -9,7 +9,7 @@ class Dummy:
     def __init__(self):
         logging.debug("Dummy module initiated.")
 
-    def run(self, api):
+    def run(self, broker):
         """
         Make all stuff. For example, initialize process. Or just nothing.
         :return:
