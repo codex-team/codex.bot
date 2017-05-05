@@ -3,7 +3,7 @@ import importlib
 import logging
 import os
 
-from lib.logging import Logging
+from codexbot.lib.logging import Logging
 
 from codexbot.broker.broker import Broker
 from codexbot.globalcfg import SERVER
