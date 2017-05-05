@@ -46,6 +46,12 @@ class Core:
                     raise Exception("Module {} is already registered.".format(name))
 
                 self.modules[name] = current_module.module_obj
+
+                # getting module route and use Core decorator
+                # see set_routes
+                module_routes = current_module.module_obj.get_routes()
+                self.set_routes(module_routes)
+
                 current_module.module_obj.run(self.server, self.api)
 
             except Exception as e:
@@ -53,6 +59,10 @@ class Core:
 
         logging.debug("{} modules loaded.".format(len(self.modules)))
 
+    # aiohttp server routes decorator
+    def set_routes(self, routes):
+        for route in routes:
+            self.server.router.add_route(*route)
 
 # TODO1: static methods
 # TODO2: logging setup
