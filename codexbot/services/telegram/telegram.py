@@ -1,9 +1,10 @@
 import logging
-import requests
 from urllib.parse import urlencode
-from lib.server import http_response
 
-from configuration.globalcfg import URL
+import requests
+
+from codexbot.globalcfg import URL
+from codexbot.lib.server import http_response
 from .config import BOT_NAME, API_TOKEN, API_URL, CALLBACK_ROUTE
 
 

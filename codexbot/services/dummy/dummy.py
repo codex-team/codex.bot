@@ -4,6 +4,7 @@ import logging
 class Dummy:
 
     __name__ = "Dummy"
+    self.routes = []
 
     def __init__(self):
         logging.debug("Dummy module initiated.")
@@ -14,7 +15,3 @@ class Dummy:
         :return:
         """
         pass
-
-    def get_routes(self):
-        routes = []
-        return routes
