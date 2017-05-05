@@ -1,10 +1,10 @@
 import logging
 import requests
-import json
 from urllib.parse import urlencode
-
 from lib.server import http_response
-from .config import TelegramConfig
+
+from configuration.config import URL
+from .config import BOT_NAME, API_TOKEN, API_URL, CALLBACK_ROUTE
 
 
 class Telegram:
@@ -12,7 +12,13 @@ class Telegram:
     __name__ = "Telegram"
 
     def __init__(self):
-        self.config = TelegramConfig()
+        self.__token = API_TOKEN
+        self.__api_url = API_URL + API_TOKEN + '/'
+        self.__callback_url = URL + CALLBACK_ROUTE
+        self.__callback_route = CALLBACK_ROUTE
+
+        self.__bot_name = BOT_NAME
+
         logging.debug("Telegram module initiated.")
 
     @http_response
@@ -32,14 +38,14 @@ class Telegram:
         self.server = server
         self.api = api
         routes = [
-            ('POST', self.config.callback_route(), self.telegram_callback)
+            ('POST', self.__callback_route, self.telegram_callback)
         ]
         self.server.set_routes(routes)
         self.set_webhook()
 
     def set_webhook(self):
-        query = self.config.api_url() + 'setWebhook?' + urlencode({
-            'url': self.config.callback_url()
+        query = self.__api_url + 'setWebhook?' + urlencode({
+            'url': self.__callback_url
         })
 
         try:
@@ -55,7 +61,7 @@ class Telegram:
             'chat_id': chat_id,
             'text': text
         }
-        url = self.config.api_url() + 'sendMessage'
+        url = self.__api_url + 'sendMessage'
 
         response = requests.post(url, json=data)
         if response.status_code != 200:
@@ -74,7 +80,7 @@ class Telegram:
             'photo': open(filename, 'rb')
         }
 
-        url = self.config.api_url() + 'sendPhoto'
+        url = self.__api_url + 'sendPhoto'
 
         response = requests.post(url, data, files=files)
         if response.status_code != 200:
