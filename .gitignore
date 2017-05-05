@@ -1,4 +1,5 @@
 *.pyc
 .idea
 venv
-**/settings.py
+**/config.py
+configuration/globalcfg.py
