@@ -20,7 +20,9 @@ class Telegram:
         self.__callback_route = CALLBACK_ROUTE
 
         self.__bot_name = BOT_NAME
-        self.get_routes()
+        self.routes = [
+            ('POST', CALLBACK_ROUTE, self.telegram_callback)
+        ]
 
         logging.debug("Telegram module initiated.")
 
@@ -85,8 +87,3 @@ class Telegram:
             logging.debug("Error while sending photo to Telegram: {}".format(response.content))
 
         return response
-
-    def get_routes(self):
-        self.routes = [
-            ('POST', CALLBACK_ROUTE, self.telegram_callback)
-        ]
