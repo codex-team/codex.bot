@@ -46,7 +46,11 @@ class Core:
                     raise Exception("Module {} is already registered.".format(name))
 
                 self.modules[name] = current_module.module_obj
-                current_module.module_obj.run(self.server, self.broker)
+
+                current_module.module_obj.run(self.broker)
+
+                # set routes for this module
+                self.server.set_routes(current_module.module_obj.routes)
 
             except Exception as e:
                 logging.error(e)
