@@ -5,7 +5,9 @@ import requests
 
 from codexbot.globalcfg import URL
 from codexbot.lib.server import http_response
-from .config import CALLBACK_ROUTE, BOT_NAME, TOKEN, CLIENT_SECRET, CLIENT_ID
+
+from .config import CALLBACK_ROUTE, BOT_NAME, BOT_TOKEN, CLIENT_SECRET, CLIENT_ID
+from .methods import send_message, get_bot_id, channels_list
 
 from slackclient import SlackClient
 
@@ -15,12 +17,17 @@ class Slack:
     __name__ = "Slack"
 
     def __init__(self):
+        """
+        Initialize Slack module. 
+        Get secrets and callback route from config
+        """
         self.__callback_route = CALLBACK_ROUTE
         self.__callback_url = URL + CALLBACK_ROUTE
         self.__client_id = CLIENT_ID
         self.__client_secret = CLIENT_SECRET
         self.__bot_name = BOT_NAME
-        self.__token = TOKEN
+        self.__token = BOT_TOKEN
+
         self.routes = [
             ('GET', self.__callback_route, self.slack_callback)
         ]
@@ -37,11 +44,14 @@ class Slack:
         self.slack_client = SlackClient(self.__token)
 
         # test API
-        self.slack_client.api_call("api.test")
+        api = self.slack_client.api_call("api.test")
+        if api.get('ok'):
+            logging.debug("Slack API - OK...")
 
         # Auth test
-        self.slack_client.api_call("auth.test")
-
+        auth = self.slack_client.api_call("auth.test")
+        if auth.get('ok'):
+            logging.debug("Slack Auth - OK...")
 
     @http_response
     def slack_callback(self, text, post, json):
@@ -50,17 +60,3 @@ class Slack:
         :return:
         """
         logging.info("Got slack callback {} {} {}".format(text, post, json))
-
-    def channels_list(self):
-        channels_list = self.slack_client.api_call("channels.list")
-        if channels_list.get('ok'):
-            return channels_list['channels']
-        return None
-
-    def send_message(self, channel_id, message, username):
-        self.slack_client.api_call(
-            "chat.postMessage",
-            channel=channel_id,
-            text=message,
-            username=self.__bot_name
-        )
