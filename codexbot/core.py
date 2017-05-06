@@ -49,10 +49,8 @@ class Core:
 
                 current_module.module_obj.run(self.broker)
 
-                try:
-                    self.server.set_routes(current_module.module_obj.routes)
-                except Exception as e:
-                    logging.error(e)
+                # get routes for this module
+                self.server.set_routes(current_module.module_obj.routes)
 
             except Exception as e:
                 logging.error(e)
