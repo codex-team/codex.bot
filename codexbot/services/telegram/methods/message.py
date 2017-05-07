@@ -12,6 +12,16 @@ class Message(Base):
 
     @message
     def send(self, text, parse_mode=None, disable_web_page_preview=True, **kwargs):
+        """
+        Sends message to chat
+        Use @message decorator
+        
+        :param text: 
+        :param parse_mode: Markdown or HTML
+        :param disable_web_page_preview: if True, disable links preview
+        :param kwargs: 
+        :return: message payload
+        """
 
         if not text:
             raise Exception('Message text is required')
@@ -32,6 +42,15 @@ class Message(Base):
 
     @message
     def forward(self, from_chat_id, message_id, **kwargs):
+        """
+        Forwards message
+        Use @message decorator
+        
+        :param from_chat_id: chat to forward from
+        :param message_id: message to forward
+        :param kwargs: 
+        :return:
+        """
 
         if not from_chat_id:
             raise Exception('Chat id to forward from is required')

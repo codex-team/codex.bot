@@ -1,11 +1,30 @@
 import requests
 import logging
+import json
 
 
 def message(function):
+    """
+    Decorator for telegram sending methods    
+    :param function: 
+    :return: 
+    """
 
     def decorator(self, chat_id, *args, **kwargs):
-
+        """
+        Telegram methods wrapper.
+        Gets required :param chat_id:
+        Optional keyword arguments:
+        :argument reply_to_message_id: message to reply
+        :argument disable_notification: if True, sending message silently
+        :argument reply_markup: Telegram reply_markup object. Could be set by set_reply_markup
+        
+        :param self: 
+        :param chat_id: 
+        :param args: 
+        :param kwargs: 
+        :return True|False: True if message was sent successfully, False otherwise 
+        """
         if not chat_id:
             raise Exception('Chat id is required')
 
@@ -29,6 +48,7 @@ def message(function):
             files = data['files']
 
         if len(files.keys()):
+            data['payload']['reply_markup'] = json.dumps(data['payload']['reply_markup'])
             result = requests.post(self.api_url + data['method'], data=data['payload'], files=files)
         else:
             result = requests.post(self.api_url + data['method'], json=data['payload'])
@@ -41,7 +61,11 @@ def message(function):
 
     return decorator
 
+
 class Base:
+    """
+    Interface for Telegram objects
+    """
 
     __name__ = "Telegram object interface"
 
@@ -51,6 +75,16 @@ class Base:
     reply_markup = {}
 
     def set_reply_markup(self, keyboard=None, inline_keyboard=None, remove_keyboard=None, force_reply=None):
+        """
+        Fill self.reply_markup.
+        Message decorator use self.reply_markup to send markup to chat
+        
+        :param keyboard: Reply Keyboard object. Could be got by ReplyKeyboard class
+        :param inline_keyboard: Inline Keyboard object. Could be got by InlineKeyboard class
+        :param remove_keyboard: Reply Keyboard Remove object. Could be got by ReplyKeyboard class
+        :param force_reply: Force Reply object. Could be got by ForceReply class
+        """
+
         if keyboard:
             self.reply_markup['keyboard'] = keyboard['keyboard']
             self.reply_markup['resize_keyboard'] = keyboard['resize_keyboard']
