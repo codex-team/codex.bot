@@ -7,6 +7,12 @@ from codexbot.globalcfg import URL
 from codexbot.lib.server import http_response
 from .config import BOT_NAME, API_TOKEN, API_URL, CALLBACK_ROUTE
 
+from .methods.message import Message
+from .methods.photo import Photo
+from .methods.sticker import Sticker
+from .methods.video import Video
+from .methods.markups import InlineKeyboard, ReplyKeyboard, ForceReply
+
 
 class Telegram:
 
@@ -18,11 +24,16 @@ class Telegram:
         self.__api_url = API_URL + API_TOKEN + '/'
         self.__callback_url = URL + CALLBACK_ROUTE
         self.__callback_route = CALLBACK_ROUTE
-
         self.__bot_name = BOT_NAME
+
         self.routes = [
             ('POST', CALLBACK_ROUTE, self.telegram_callback)
         ]
+
+        self.message = Message(self.__api_url)
+        self.photo = Photo(self.__api_url)
+        self.sticker = Sticker(self.__api_url)
+        self.video = Video(self.__api_url)
 
         logging.debug("Telegram module initiated.")
 
@@ -54,36 +65,3 @@ class Telegram:
             logging.debug(e)
         else:
             logging.debug(result.content)
-
-    def message(self, text, chat_id):
-
-        data = {
-            'chat_id': chat_id,
-            'text': text
-        }
-        url = self.__api_url + 'sendMessage'
-
-        response = requests.post(url, json=data)
-        if response.status_code != 200:
-            logging.debug("Error while sending message to Telegram: {}".format(response.content))
-
-        return response
-
-    def image(self, filename, caption, chat_id):
-
-        data = {
-            'caption': caption,
-            'chat_id': chat_id,
-        }
-
-        files = {
-            'photo': open(filename, 'rb')
-        }
-
-        url = self.__api_url + 'sendPhoto'
-
-        response = requests.post(url, data, files=files)
-        if response.status_code != 200:
-            logging.debug("Error while sending photo to Telegram: {}".format(response.content))
-
-        return response
