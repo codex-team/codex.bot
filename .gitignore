@@ -3,3 +3,4 @@
 venv
 **/config.py
 globalcfg.py
+.coverage

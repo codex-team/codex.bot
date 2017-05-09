@@ -17,3 +17,6 @@ setuptools==35.0.2
     - six [required: Any, installed: 1.10.0]
   - six [required: >=1.6.0, installed: 1.10.0]
 wheel==0.29.0
+nose
+coverage
+report
