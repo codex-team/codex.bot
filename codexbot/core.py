@@ -3,8 +3,7 @@ import importlib
 import logging
 import os
 
-from lib.logging import Logging
-
+from codexbot.lib.logging import Logging
 from codexbot.broker.broker import Broker
 from codexbot.globalcfg import SERVER
 from codexbot.lib.server import Server
@@ -40,22 +39,20 @@ class Core:
         """
         for module in filter(lambda x: not x.startswith('__'), os.listdir('codexbot/services')):
             try:
-                current_module = importlib.import_module("services.{}".format(module))
+                current_module = importlib.import_module("codexbot.services.{}".format(module))
 
                 name = current_module.module_obj.__name__
                 if name in self.modules:
                     raise Exception("Module {} is already registered.".format(name))
 
                 self.modules[name] = current_module.module_obj
-                current_module.module_obj.run(self.server, self.broker)
+
+                current_module.module_obj.run(self.broker)
+
+                # set routes for this module
+                self.server.set_routes(current_module.module_obj.routes)
 
             except Exception as e:
                 logging.error(e)
 
         logging.debug("{} modules loaded.".format(len(self.modules)))
-
-
-# TODO1: static methods
-# TODO2: logging setup
-
-core = Core()

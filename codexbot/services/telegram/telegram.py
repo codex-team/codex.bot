@@ -7,18 +7,33 @@ from codexbot.globalcfg import URL
 from codexbot.lib.server import http_response
 from .config import BOT_NAME, API_TOKEN, API_URL, CALLBACK_ROUTE
 
+from .methods.message import Message
+from .methods.photo import Photo
+from .methods.sticker import Sticker
+from .methods.video import Video
+from .methods.markups import InlineKeyboard, ReplyKeyboard, ForceReply
+
 
 class Telegram:
 
     __name__ = "Telegram"
+    routes = []
 
     def __init__(self):
         self.__token = API_TOKEN
         self.__api_url = API_URL + API_TOKEN + '/'
         self.__callback_url = URL + CALLBACK_ROUTE
         self.__callback_route = CALLBACK_ROUTE
-
         self.__bot_name = BOT_NAME
+
+        self.routes = [
+            ('POST', CALLBACK_ROUTE, self.telegram_callback)
+        ]
+
+        self.message = Message(self.__api_url)
+        self.photo = Photo(self.__api_url)
+        self.sticker = Sticker(self.__api_url)
+        self.video = Video(self.__api_url)
 
         logging.debug("Telegram module initiated.")
 
@@ -31,17 +46,12 @@ class Telegram:
         logging.info("Got telegram callback {} {} {}".format(text, post, json))
         return True
 
-    def run(self, server, broker):
+    def run(self, broker):
         """
         Make all stuff. For example, initialize process. Or just nothing.
         :return:
         """
-        self.server = server
         self.broker = broker
-        routes = [
-            ('POST', self.__callback_route, self.telegram_callback)
-        ]
-        self.server.set_routes(routes)
         self.set_webhook()
 
     def set_webhook(self):
