@@ -10,7 +10,7 @@ class Video(Base):
     @message
     def send(self, video, caption=None, duration=None, width=None, height=None, **kwargs):
         """
-        Sends video to chat
+        Send video to chat
         Use @message decorator
         
         :param video: path to file

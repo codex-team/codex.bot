@@ -10,7 +10,7 @@ class Sticker(Base):
     @message
     def send(self, sticker, **kwargs):
         """
-        Sends sticker to chat
+        Send sticker to chat
         Use @message decorator
         
         :param sticker: sticker id or url to .webp file

@@ -1,6 +1,6 @@
 class Base:
     """
-    Interface for Telegram markup keyboards objects
+    Interface for Telegram markup keyboard objects
     """
 
     __name__ = "Keyboards interface"
@@ -10,7 +10,7 @@ class Base:
         """
         Append arguments to keyboard as new row
         
-        :param args: Reply or Inline Keyboards objects 
+        :param args: Reply or Inline Keyboard objects 
         :return: 
         """
 
@@ -28,8 +28,8 @@ class ReplyKeyboard(Base):
         Returns ReplyKeyboardButton object
         
         :param text: button label
-        :param request_contact: if True, button requests user phone contact
-        :param request_location: if True, button requests user location request 
+        :param request_contact: if True, button requests user's phone contact
+        :param request_location: if True, button requests user's location request 
         :return: ReplyKeyboardButton object
         """
 
@@ -46,7 +46,7 @@ class ReplyKeyboard(Base):
         
         :param resize_keyboard: if True, keyboard will be fit to buttons labels
         :param one_time_keyboard: if True, keyboard will be removed after pressing the button
-        :param selective: if True, keyboard will be shown only for mentioned users or for user, who message is replying
+        :param selective: if True, keyboard will be shown only for mentioned users or for user, whose message is under reply
         :return: InlineKeyboard object
         """
 
@@ -123,7 +123,7 @@ class ForceReply:
         """
         Returns ReplyKeyboardRemove object
         
-        :param selective: if True, remove keyboard only for mentioned users, or for user, who message is replying
+        :param selective: if True, remove keyboard only for mentioned users, or for user, whose message is under reply
         :return: ReplyKeyboardRemove object 
         """
 

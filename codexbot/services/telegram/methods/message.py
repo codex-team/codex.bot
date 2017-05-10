@@ -13,7 +13,7 @@ class Message(Base):
     @message
     def send(self, text, parse_mode=None, disable_web_page_preview=True, **kwargs):
         """
-        Sends message to chat
+        Send message to chat
         Use @message decorator
         
         :param text: 
@@ -43,7 +43,7 @@ class Message(Base):
     @message
     def forward(self, from_chat_id, message_id, **kwargs):
         """
-        Forwards message
+        Forward message
         Use @message decorator
         
         :param from_chat_id: chat to forward from

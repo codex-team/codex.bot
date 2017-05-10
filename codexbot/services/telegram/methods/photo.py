@@ -10,7 +10,7 @@ class Photo(Base):
     @message
     def send(self, photo, caption=None, **kwargs):
         """
-        Sends photo to chat
+        Send photo to chat
         Use @message decorator
         
         :param photo: path to file
