@@ -5,8 +5,8 @@ import os
 
 from codexbot.lib.logging import Logging
 from codexbot.broker.broker import Broker
-from codexbot.globalcfg import SERVER
-from codexbot.lib.server import Server
+from codexbot.globalcfg import SERVER, HANDSHAKE_URL
+from codexbot.lib.server import Server, http_response
 
 
 class Core:
@@ -18,16 +18,49 @@ class Core:
         self.event_loop = asyncio.get_event_loop()
         self.init_broker()
         self.init_server()
+        self.set_system_routes()
         self.init_queue()
         self.init_modules()
         self.server.start()
 
     def init_queue(self):
-        logging.debug("Initiate queue and loop.")
+        self.logging.log("Initiate queue and loop.")
         self.broker.start()
 
     def init_server(self):
         self.server = Server(self.event_loop, SERVER['host'], SERVER['port'])
+
+    def set_system_routes(self):
+        """
+        Specifies required core-routes
+        :return:
+        """
+
+        routes = [
+            ('POST', HANDSHAKE_URL, self.handshake_callback)
+        ]
+        self.server.set_routes(routes)
+
+    @http_response
+    def handshake_callback(self, text, post, json):
+        """
+        External tools handshake
+        Uses to specify unique queue name for tool
+        :param text:
+        :param post:
+        :param json:
+        :return: queue name
+        """
+        tool = post["tool"]
+        self.logging.log("Handshake request received from {} tool ".format(tool))
+
+        # TODO provide name uniqueness
+        queue_name_delegated = tool
+
+        # TODO register queue for tool
+        # self.broker.add_queue(queue_name_delegated)
+
+        return queue_name_delegated
 
     def init_broker(self):
         self.broker = Broker(self, self.event_loop)
@@ -55,4 +88,4 @@ class Core:
             except Exception as e:
                 logging.error(e)
 
-        logging.debug("{} modules loaded.".format(len(self.modules)))
+        self.logging.log("{} modules loaded.".format(len(self.modules)))

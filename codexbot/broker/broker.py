@@ -40,3 +40,7 @@ class Broker:
 
     def start(self):
         self.event_loop.run_until_complete(init_receiver_v3(self.callback, "core"))
+
+    def add_queue(self, queue_name):
+        self.event_loop.run_until_complete(init_receiver_v3(self.callback, queue_name))
+        logging.debug("New queue {} added ".format(queue_name))

@@ -10,3 +10,12 @@ class Logging:
 
         logging.basicConfig(level=logging.DEBUG, format=format_str)
         logging.debug("Logging initiated.")
+
+    @staticmethod
+    def log(message):
+        logging.debug(message)
+
+    @staticmethod
+    def dump(obj):
+        for attr in dir(obj):
+            print("obj.%s = %s" % (attr, getattr(obj, attr)))

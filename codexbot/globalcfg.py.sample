@@ -14,3 +14,6 @@ SERVER = {
 RABBITMQ = {
     'host': '127.0.0.1',
 }
+
+# Route for external plugins handshake
+HANDSHAKE_URL = '/handshake'
