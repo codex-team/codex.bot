@@ -17,8 +17,8 @@ class Core:
 
         self.logging = Logging()
         self.event_loop = asyncio.get_event_loop()
-        self.init_broker()
         self.init_db()
+        self.init_broker()
         self.init_server()
         self.init_queue()
         self.init_modules()
