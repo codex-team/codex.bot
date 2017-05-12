@@ -3,7 +3,10 @@ from .message import Message
 from .callbackquery import CallbackQuery
 
 
-class Update():
+class Update:
+
+    # https://core.telegram.org/bots/api#update
+    __name__  = "Telegram Update"
 
     message = None
     edited_message = None

@@ -3,7 +3,11 @@ from .chat import Chat
 from .user import User
 from .messageentity import MessageEntity
 
+
 class Message:
+
+    # https://core.telegram.org/bots/api#message
+    __name__ = "Telegram Message"
 
     # TODO: добавить все поля в соответствии с https://core.telegram.org/bots/api#message
     user = None

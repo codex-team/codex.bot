@@ -5,6 +5,9 @@ from .message import Message
 
 class CallbackQuery:
 
+    # https://core.telegram.org/bots/api#callbackquery
+    __name__ = "Telegram Callback Query"
+
     message = None
     inline_message_id = None
     data = None

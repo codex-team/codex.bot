@@ -4,6 +4,9 @@ from .user import User
 
 class MessageEntity:
 
+    # https://core.telegram.org/bots/api#messageentity
+    __name__ = "Telegram Message Entity"
+
     url = None
     user = None
 

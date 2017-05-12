@@ -3,6 +3,9 @@ from json import loads
 
 class Chat:
 
+    # https://core.telegram.org/bots/api#chat
+    __name__ = "Telegram Chat"
+
     title = None
     username = None
     first_name = None

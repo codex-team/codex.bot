@@ -3,6 +3,9 @@ from json import loads
 
 class User:
 
+    # https://core.telegram.org/bots/api#user
+    __name__ = "Telegram User"
+
     last_name = None
     username = None
 
