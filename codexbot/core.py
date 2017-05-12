@@ -3,6 +3,7 @@ import importlib
 import logging
 import os
 
+from codexbot.lib.db import Db
 from codexbot.lib.logging import Logging
 from codexbot.broker.broker import Broker
 from codexbot.globalcfg import SERVER
@@ -17,6 +18,7 @@ class Core:
         self.logging = Logging()
         self.event_loop = asyncio.get_event_loop()
         self.init_broker()
+        self.init_db()
         self.init_server()
         self.init_queue()
         self.init_modules()
@@ -31,6 +33,10 @@ class Core:
 
     def init_broker(self):
         self.broker = Broker(self, self.event_loop)
+
+    def init_db(self):
+        logging.debug("Initiate DB")
+        self.db = Db('default')
 
     def init_modules(self):
         """
