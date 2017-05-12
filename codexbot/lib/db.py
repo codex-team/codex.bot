@@ -3,6 +3,7 @@ from pymongo import MongoClient
 
 
 class Db():
+    # TODO: Has to be thread safe
 
     def __init__(self, dbname, host='localhost', port=27017):
         """
@@ -46,12 +47,17 @@ class Db():
 
     def insert(self, collection, data):
         """
-
-        :param collection:
-        :param data:
-        :return:
+        Insert data into collection
+        :param collection: collection name
+        :param data: JSON object to insert
+        :return: result object with 'inserted_id' parameter
         """
         return self.db[collection].insert(data)
 
     def remove(self, collection):
+        """
+        Remove collection from db
+        :param collection: collection name
+        :return:
+        """
         return self.db[collection].remove()

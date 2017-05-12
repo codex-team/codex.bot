@@ -35,6 +35,10 @@ class Core:
         self.broker = Broker(self, self.event_loop)
 
     def init_db(self):
+        """
+        Initialize self.db object with 'default' database name
+        :return:
+        """
         logging.debug("Initiate DB")
         self.db = Db('default')
 
