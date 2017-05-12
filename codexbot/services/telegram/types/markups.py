@@ -3,7 +3,7 @@ class Base:
     Interface for Telegram markup keyboard objects
     """
 
-    __name__ = "Keyboards interface"
+    __name__ = "Telegram keyboards interface"
     keyboard = []
 
     def row(self, *args):
@@ -20,8 +20,10 @@ class Base:
 
 class ReplyKeyboard(Base):
 
-    __name__ = "Reply Keyboard Markup"
+    # https://core.telegram.org/bots/api#replykeyboardmarkup
+    __name__ = "Telegram Reply Keyboard Markup"
 
+    # https://core.telegram.org/bots/api#inlinekeyboardbutton
     @staticmethod
     def button(text, request_contact=False, request_location=False):
         """
@@ -60,6 +62,7 @@ class ReplyKeyboard(Base):
             'selective': selective
         }
 
+    # https://core.telegram.org/bots/api#replykeyboardremove
     def remove(self, selective=False):
         return {
             'remove_keyboard': True,
@@ -69,8 +72,10 @@ class ReplyKeyboard(Base):
 
 class InlineKeyboard(Base):
 
-    __name__ = "Inline Keyboard Markup"
+    # https://core.telegram.org/bots/api#inlinekeyboardmarkup
+    __name__ = "Telegram Inline Keyboard Markup"
 
+    # https://core.telegram.org/bots/api#keyboardbutton
     @staticmethod
     def button(text, callback_data=None, url=None, switch_inline_query=None, switch_inline_query_current_chat=None):
         """
@@ -116,7 +121,8 @@ class InlineKeyboard(Base):
 
 class ForceReply:
 
-    __name__ = "Force Reply"
+    # https://core.telegram.org/bots/api#forcereply
+    __name__ = "Telegram Force Reply"
 
     @staticmethod
     def get(selective=False):

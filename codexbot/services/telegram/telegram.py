@@ -6,13 +6,12 @@ import requests
 from codexbot.globalcfg import URL
 from codexbot.lib.server import http_response
 from .config import BOT_NAME, API_TOKEN, API_URL, CALLBACK_ROUTE
-
 from .methods.message import Message
 from .methods.photo import Photo
 from .methods.sticker import Sticker
 from .methods.video import Video
-from .methods.markups import InlineKeyboard, ReplyKeyboard, ForceReply
 
+from .types.update import Update
 
 class Telegram:
 
@@ -43,6 +42,8 @@ class Telegram:
         Process messages from telegram bot
         :return:
         """
+
+        update = Update(json)
         logging.info("Got telegram callback {} {} {}".format(text, post, json))
         return True
 
