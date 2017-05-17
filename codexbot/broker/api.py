@@ -5,6 +5,7 @@ import string
 from ..lib.logging import Logging
 import logging
 
+
 class API:
 
     APPS_COLLECTION_NAME = 'apps'
