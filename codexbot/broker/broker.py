@@ -27,8 +27,12 @@ class Broker:
         :param properties:
         :return:
         """
-        logging.debug(" [x] Received %r" % body)
-        yield from self.api.process(body.decode("utf-8"))
+        try:
+            logging.debug(" [x] Received %r" % body)
+            yield from self.api.process(body.decode("utf-8"))
+        except Exception as e:
+            logging.error("Broker callback error")
+            logging.error(e)
 
     def send(self, message, queue_name, host='localhost'):
         """
