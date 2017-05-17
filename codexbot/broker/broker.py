@@ -1,11 +1,15 @@
 import asyncio
 import logging
 
-from codexbot.lib.rabbitmq import send_message_v3, init_receiver_v3
+from codexbot.lib.rabbitmq import add_message_to_queue, init_receiver
 from .api import API
 
 
 class Broker:
+
+    OK = 200
+    WRONG = 400
+    ERROR = 500
 
     def __init__(self, core, event_loop):
         logging.info("Broker started ;)")
@@ -34,11 +38,11 @@ class Broker:
         :param host: destination host address
         :return:
         """
-        yield from send_message_v3(message, queue_name, host=host)
+        yield from add_message_to_queue(message, queue_name, host=host)
 
     def start(self):
         """
         Receive all messages from 'core' queue to self.callback
         :return:
         """
-        self.event_loop.run_until_complete(init_receiver_v3(self.callback, "core"))
+        self.event_loop.run_until_complete(init_receiver(self.callback, "core"))
