@@ -8,6 +8,9 @@ import logging
 
 class API:
 
+    APPS_COLLECTION_NAME = 'apps'
+    COMMANDS_COLLECTION_NAME = 'commands'
+
     def __init__(self, broker):
 
         self.logging = Logging()
@@ -16,123 +19,158 @@ class API:
 
         # Methods list (command => processor)
         self.methods = {
-            'initialize plugin': self.initialize_plugin,
+            'initialize app': self.initialize_app,
             'register commands': self.register_commands
         }
         # List of registered commands
         self.commands = {
-            # Key is command name, value is tuple(description, module name)
+            # Key is command name, value is tuple(description, application name)
             '/help': ('Show help', 'core')
         }
-        # Generate list of modules (self.modules)
-        self.modules = {}
-        self.modules_token = {}
-        self.load_modules()
+        # Generate list of applications (self.apps)
+        self.apps = {}
+        self.load_apps()
 
-    def load_modules(self):
+    def load_apps(self):
         """
-        Load modules dictionary from DB into self.modules as dict('hash' => JSON))
+        Load applications dictionary from DB into self.apps as dict('hash' => JSON))
         :return:
         """
-        modules_list = self.db.find('plugins', {})
-        for module in modules_list:
-            self.modules[module['plugin']] = module
-            self.modules_token[module['token']] = module
+        apps_list = self.db.find(API.APPS_COLLECTION_NAME, {})
+        for app in apps_list:
+            self.load_app(app)
+
+    def load_app(self, app_data):
+        """
+        Adds application to the local self.apps cache
+        :param app_data: dict
+            'token':        application token,
+            'name':         application name,
+            'queue':        queue name,
+            'host':         application host address,
+            'port':         application port,
+            'description':  application description
+        :return:
+        """
+        if not app_data['token'] in self.apps:
+            self.apps[app_data['token']] = app_data
 
     @staticmethod
-    def generate_token(size=8, chars=string.ascii_uppercase + string.digits):
+    def generate_app_token(size=8, chars=string.ascii_uppercase + string.digits):
         """
         Generate unique string
+        Application will use this token for authentication
         :param size: size in symbols
         :param chars: letters used
         :return: string token
         """
         return ''.join(random.SystemRandom().choice(chars) for _ in range(size))
 
-    def send_message(self, code, message, plugin_data):
+    def send_message(self, code, message, app_data):
         """
-        Pack message with result code into json string and send to brocker.send
+        Pack message with result code into JSON string and send to broker.send
         :param code: status code
         :param message: message
-        :param plugin_data: dictionary with 'queue' and 'host' parameters of the destination queue
+        :param app_data: dictionary with 'queue' and 'host' parameters of the destination queue
         :return:
         """
         message = json.dumps({
             'code': code,
             'message': message
         })
-        return self.broker.send(message, plugin_data['queue'], host=plugin_data['host'])
+        return self.broker.send(message, app_data['queue'], host=app_data['host'])
 
-    def process(self, data):
+    def process(self, message_data):
         """
         Process message with corresponding proccessor from self.methods by key in 'command' field
-        :param data: dictionary with 'command', 'plugin' and 'payload' keys
+        :param message_data: dictionary with 'command', (app) 'token' and 'payload' keys
+
+        !!! Except 1 case:
+        For processing 'initialize app' command, we send app-name as 'token'
+
         :return:
         """
-        data = json.loads(data)
-        yield from self.methods[data['command']](data['plugin'], data['payload'])
+        message_data = json.loads(message_data)
+        app_token = message_data['token']
+        yield from self.methods[message_data['command']](app_token, message_data['payload'])
 
 
     #--# Callbacks #--#
 
-    def initialize_plugin(self, plugin_name, plugin_data):
+    def initialize_app(self, app_name, app_data):
         """
-        Initialize module.
-        Return unique hashcode ID if the module in registered successfully.
-        Return error code and message if module has already been registered.
-        :param plugin_name:
-        :param plugin_data: dict
-            'plugin':       plugin name,
+        Initialize application.
+        Responds with app_token if application was successfully registered.
+        Responds with error (code and message) if application has been already registered.
+        :param app_name:
+        :param app_data: dict
+            'name':         application name,
             'queue':        queue name,
-            'host':         plugin host address,
-            'port':         plugin port,
-            'description':  plugin description in messenger
+            'host':         application host address,
+            'port':         application port,
+            'description':  application description in messenger
         :return:
         """
         try:
-            plugin = self.db.find_one('plugins', {'plugin': plugin_data['plugin'], 'host': plugin_data['host']})
-            if plugin:
-                yield from self.send_message(500, 'Plugin {} is already registered'.format(plugin_name), plugin_data)
+            app = self.db.find_one(API.APPS_COLLECTION_NAME, {'name': app_data['name'], 'host': app_data['host']})
+            if app:
+                yield from self.send_message(
+                    self.broker.WRONG,
+                    'Application {} is already registered'.format(app_name),
+                    app_data
+                )
             else:
-                plugin_data['token'] = API.generate_token()
-                self.db.insert('plugins', plugin_data)
-                yield from self.send_message(200, 'Plugin {} has been successfully registered'.format(plugin_name), plugin_data)
+                app_data['token'] = API.generate_app_token()
+                self.db.insert(API.APPS_COLLECTION_NAME, app_data)
+                self.load_app(app_data)
+                yield from self.send_message(
+                    self.broker.OK,
+                    'Application {} has been successfully registered'.format(app_name),
+                    app_data
+                )
 
         except Exception as e:
-            yield from self.send_message(308, 'Error', plugin_data)
+            yield from self.send_message(self.broker.ERROR, 'Error', app_data)
             logging.error(e)
         else:
-            logging.debug("Plugin {} initialized".format(plugin_name))
+            logging.debug("Application {} initialized".format(app_name))
 
-    def register_commands(self, plugin_name, plugin_data):
+    def register_commands(self, app_token, commands):
         """
-        Register list of commands as belongings to the module with plugin_name
-        :param plugin_name: module name string
-        :param plugin_data: list of commands
+        Register list of commands as belongings to the application with app_token
+        :param app_token: application token string
+        :param commands: list of commands
             [
                 'description':      command description for messenger
                 'name':             command name
             ]
         :return:
         """
+
+        if app_token not in self.apps:
+            logging.error('Cant register commands: application with token {} not loaded.'.format(app_token))
+            return
+
+        app_name = self.apps[app_token]['name']
+
         try:
-            commands_len = len(plugin_data)
+            commands_len = len(commands)
             deny = []
-            for command in plugin_data:
+            for command in commands:
                 name, description = command
                 if not name in self.commands.keys():
-                    self.commands[name] = (description, plugin_name)
-                    self.db.insert('commands', {
+                    self.commands[name] = (description, app_token)
+                    self.db.insert(API.COMMANDS_COLLECTION_NAME, {
                         'name': name,
                         'description': description,
-                        'module': plugin_name,
-                        'token': self.modules[plugin_name]['token']
+                        'app_name': app_name,
+                        'app_token': app_token
                     })
                 else:
                     deny.append(name)
 
         except Exception as e:
-            yield from self.send_message(308, 'Error', plugin_data)
+            yield from self.send_message(self.broker.ERROR, 'Error', self.apps[app_token])
             logging.error(e)
         else:
-            logging.debug("Plugin {} registered {} commands".format(plugin_name, commands_len - len(deny)))
+            logging.debug("Application {} registered {} commands".format(app_name, commands_len - len(deny)))
