@@ -20,8 +20,8 @@ class Core:
         self.init_db()
         self.init_broker()
         self.init_server()
-        self.init_queue()
         self.init_modules()
+        self.init_queue()
         self.server.start()
 
     def init_queue(self):
