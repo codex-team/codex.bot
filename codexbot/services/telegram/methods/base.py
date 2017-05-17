@@ -71,8 +71,7 @@ class Base:
 
     def __init__(self, api_url):
         self.api_url = api_url
-
-    reply_markup = {}
+        self.reply_markup = {}
 
     def set_reply_markup(self, keyboard=None, inline_keyboard=None, remove_keyboard=None, force_reply=None):
         """

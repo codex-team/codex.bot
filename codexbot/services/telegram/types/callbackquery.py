@@ -8,11 +8,11 @@ class CallbackQuery:
     # https://core.telegram.org/bots/api#callbackquery
     __name__ = "Telegram Callback Query"
 
-    message = None
-    inline_message_id = None
-    data = None
-
     def __init__(self, data):
+
+        self.message = None
+        self.inline_message_id = None
+        self.data = None
 
         if type(data) is str:
             data = loads(data)
@@ -26,4 +26,4 @@ class CallbackQuery:
         if 'inline_message_id' in data:
             self.inline_message_id = Message(data['inline_message_id'])
         if 'data' in data:
-            self.data = Message(data['data'])
+            self.data = data['data']

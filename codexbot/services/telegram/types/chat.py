@@ -6,13 +6,13 @@ class Chat:
     # https://core.telegram.org/bots/api#chat
     __name__ = "Telegram Chat"
 
-    title = None
-    username = None
-    first_name = None
-    last_name = None
-    all_members_are_administrators = None
-
     def __init__(self, data):
+
+        self.title = None
+        self.username = None
+        self.first_name = None
+        self.last_name = None
+        self.all_members_are_administrators = None
 
         if type(data) == str:
             data = loads(data)

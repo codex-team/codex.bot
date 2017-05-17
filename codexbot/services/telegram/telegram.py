@@ -13,6 +13,7 @@ from .methods.video import Video
 
 from .types.update import Update
 
+
 class Telegram:
 
     __name__ = "Telegram"
@@ -42,9 +43,10 @@ class Telegram:
         Process messages from telegram bot
         :return:
         """
+        logging.info("Got telegram callback {} {} {}".format(text, post, json))
 
         update = Update(json)
-        logging.info("Got telegram callback {} {} {}".format(text, post, json))
+
         return True
 
     def run(self, broker):
@@ -66,3 +68,4 @@ class Telegram:
             logging.debug(e)
         else:
             logging.debug(result.content)
+
