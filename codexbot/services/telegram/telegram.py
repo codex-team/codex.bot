@@ -64,5 +64,7 @@ class Telegram:
             result = requests.get(query)
         except Exception as e:
             logging.debug(e)
+            return False
         else:
             logging.debug(result.content)
+            return result.content
