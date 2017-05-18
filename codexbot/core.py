@@ -55,11 +55,11 @@ class Core:
                 if name in self.services:
                     raise Exception("Service {} is already registered.".format(name))
 
-                self.services[name] = current_service.module_obj
+                self.services[name] = current_service.service_obj
 
                 current_service.service_obj.run(self.broker)
 
-                # set routes for this module
+                # set routes for this service
                 self.server.set_routes(current_service.service_obj.routes)
 
             except Exception as e:

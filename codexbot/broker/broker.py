@@ -43,7 +43,7 @@ class Broker:
 
         if not chat:
             chat_hash = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(8))
-            self.core.db.insert('chats', {'id': message_data.chat, 'hash': chat_hash, 'service': message_data['service']})
+            self.core.db.insert('chats', {'id': message_data['chat'], 'hash': chat_hash, 'service': message_data['service']})
         else:
             chat_hash = chat['hash']
 
