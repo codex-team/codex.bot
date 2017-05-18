@@ -1,5 +1,8 @@
 import asyncio
+import json
 import logging
+import random
+import string
 
 from codexbot.lib.rabbitmq import add_message_to_queue, init_receiver
 from .api import API
@@ -33,6 +36,44 @@ class Broker:
         except Exception as e:
             logging.error("Broker callback error")
             logging.error(e)
+
+    def service_handler(self, message_data):
+
+        chat = self.core.db.find_one('chats', {'id': message_data['chat']})
+
+        if not chat:
+            chat_hash = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(8))
+            self.core.db.insert('chats', {'id': message_data.chat, 'hash': chat_hash, 'service': message_data['service']})
+        else:
+            chat_hash = chat['hash']
+
+        for incoming_cmd in message_data['commands']:
+
+            app_cmd = self.core.db.find_one(self.api.COMMANDS_COLLECTION_NAME, {
+                'name': incoming_cmd['command']
+            })
+
+            if not app_cmd:
+                return
+
+            app = self.core.db.find_one(self.api.APPS_COLLECTION_NAME, {
+                'name': app_cmd['app_name']
+            })
+
+            message = json.dumps({
+                'command': 'service callback',
+                'payload': {
+                    'command': incoming_cmd['command'],
+                    'params': incoming_cmd['payload'],
+                    'chat': chat_hash
+                }
+            })
+
+            self.send(message, app['queue'], app['host'])
+
+
+
+
 
     def send(self, message, queue_name, host='localhost'):
         """

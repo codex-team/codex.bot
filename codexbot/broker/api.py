@@ -20,7 +20,8 @@ class API:
         # Methods list (command => processor)
         self.methods = {
             'initialize app': self.initialize_app,
-            'register commands': self.register_commands
+            'register commands': self.register_commands,
+            'send to service': self.send_to_service
         }
         # List of registered commands
         self.commands = {
@@ -174,3 +175,14 @@ class API:
             logging.error(e)
         else:
             logging.debug("Application {} registered {} commands".format(app_name, commands_len - len(deny)))
+
+    def send_to_service(self, message_payload):
+
+        chat_hash = message_payload['chat_hash']
+
+        chat = self.db.find_one('chats', {hash: chat_hash})
+
+        if not chat:
+            return
+
+        self.broker.core.services[chat['service']].send(chat['id'], message_payload)

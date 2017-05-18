@@ -35,7 +35,7 @@ class Telegram:
         self.sticker = Sticker(self.__api_url)
         self.video = Video(self.__api_url)
 
-        logging.debug("Telegram module initiated.")
+        logging.debug("Telegram service initiated.")
 
     @http_response
     def telegram_callback(self, text, post, json):
@@ -46,6 +46,12 @@ class Telegram:
         logging.info("Got telegram callback {} {} {}".format(text, post, json))
 
         update = Update(json)
+
+        self.broker.service_handler({
+            'chat': update.message.chat.id,
+            'service': self.__name__,
+            'commands': update.get_commands()
+        })
 
         return True
 
@@ -69,3 +75,21 @@ class Telegram:
         else:
             logging.debug(result.content)
 
+    def send(self, chat_id, message_payload):
+
+        if 'text' in message_payload:
+            message = message_payload['text']
+            if 'markup' in message_payload:
+                self.message.set_reply_markup(*message_payload['markup'])
+            self.message.send(message)
+            return
+
+        if 'photo' in message_payload:
+            photo = message_payload['photo']
+            caption = None
+            if 'caption' in message_payload:
+                caption = message_payload['caption']
+            if 'markup' in message_payload:
+                self.photo.set_reply_markup(*message_payload['markup'])
+            self.photo.send(photo, caption)
+            return

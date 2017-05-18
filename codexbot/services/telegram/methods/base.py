@@ -53,6 +53,8 @@ def message(function):
         else:
             result = requests.post(self.api_url + data['method'], json=data['payload'])
 
+        self.clear_reply_markup()
+
         if result.status_code != 200:
             logging.debug('Error while sending Telegram message: {}'.format(result.content))
             return False
@@ -97,3 +99,6 @@ class Base:
         if force_reply:
             self.reply_markup['force_reply'] = force_reply['force_reply']
             self.reply_markup['selective'] = force_reply['selective']
+
+    def clear_reply_markup(self):
+        self.reply_markup = {}
