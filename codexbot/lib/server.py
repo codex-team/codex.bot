@@ -9,7 +9,7 @@ def http_response(function):
             json = await request.json()
         except Exception as e:
             json = {}
-        result = function(self, text, post, json)
+        result = await function(self, text, post, json)
         return aiohttp.web.Response(text="OK")
     return wrapper
 

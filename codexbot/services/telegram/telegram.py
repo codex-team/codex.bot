@@ -38,7 +38,7 @@ class Telegram:
         logging.debug("Telegram service initiated.")
 
     @http_response
-    def telegram_callback(self, text, post, json):
+    async def telegram_callback(self, text, post, json):
         """
         Process messages from telegram bot
         :return:
@@ -49,7 +49,7 @@ class Telegram:
         update = Update(json)
 
         # Pass commands from message data to broker
-        self.broker.service_handler({
+        await self.broker.process_service_msg({
             'chat': update.message.chat.id,
             'service': self.__name__,
             'commands': update.get_commands()
@@ -78,7 +78,24 @@ class Telegram:
             logging.debug(result.content)
 
     def send(self, chat_id, message_payload):
-
+        """
+        Send message to chat
+        
+         :param message_payload:
+            - chat_hash  - chat hash
+            - text       - message text
+            - photo      - photo to send (you shouldn't pass text param if you want to send photo)
+            - caption    - caption for photo
+            For markups see https://core.telegram.org/bots/api#replykeyboardmarkup
+            - markup:
+                - keyboard
+                - inline_keyboard
+                - remove_keyboard
+                - force_reply
+        
+        :param chat_id: 
+        :return: 
+        """
         if 'text' in message_payload:
             message = message_payload['text']
             if 'markup' in message_payload:
