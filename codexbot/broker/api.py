@@ -40,6 +40,7 @@ class API:
         apps_list = self.db.find(API.APPS_COLLECTION_NAME, {})
         for app in apps_list:
             self.load_app(app)
+        logging.debug(self.apps)
 
     def load_app(self, app_data):
         """

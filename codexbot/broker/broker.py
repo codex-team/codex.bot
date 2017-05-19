@@ -74,7 +74,6 @@ class Broker:
 
 
 
-
     def send(self, message, queue_name, host='localhost'):
         """
         Send message to queue on the host
@@ -83,7 +82,7 @@ class Broker:
         :param host: destination host address
         :return:
         """
-        yield from add_message_to_queue(message, queue_name, host=host)
+        self.event_loop.run_until_complete(add_message_to_queue(message, queue_name, host=host))
 
     def start(self):
         """
