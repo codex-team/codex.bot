@@ -174,8 +174,7 @@ class API:
                 name, description = command
                 if not name in self.commands.keys() and \
                    not self.db.find_one(API.COMMANDS_COLLECTION_NAME, {
-                       'name': name,
-                       'app_token': app_token
+                       'name': name
                    }
                 ):
                     self.commands[name] = (description, app_token)
@@ -194,13 +193,14 @@ class API:
         else:
             logging.debug("Application {} registered {} commands".format(app_name, commands_len - len(deny)))
 
-    def send_to_service(self, message_payload):
+    def send_to_service(self, app_token, message_payload):
 
         chat_hash = message_payload['chat_hash']
 
         chat = self.db.find_one('chats', {hash: chat_hash})
 
         if not chat:
+            yield from self.send_message(self.broker.WRONG, 'Error', self.apps[app_token])
             return
 
         self.broker.core.services[chat['service']].send(chat['id'], message_payload)

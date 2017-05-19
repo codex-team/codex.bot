@@ -54,7 +54,7 @@ class Broker:
             })
 
             if not app_cmd:
-                return
+                continue
 
             app = self.core.db.find_one(self.api.APPS_COLLECTION_NAME, {
                 'name': app_cmd['app_name']
