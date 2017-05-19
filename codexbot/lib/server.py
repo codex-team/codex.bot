@@ -32,4 +32,3 @@ class Server:
 
     def start(self):
         aiohttp.web.run_app(self.web_server, host=self.host, port=self.port)
-

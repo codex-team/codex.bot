@@ -75,10 +75,18 @@ class API:
         :param app_data: dictionary with 'queue' and 'host' parameters of the destination queue
         :return:
         """
-        message = json.dumps({
+        payload = {
             'code': code,
             'message': message
+        }
+        return self.send_command('show message', payload, app_data)
+
+    def send_command(self, command, payload, app_data):
+        message = json.dumps({
+            'command': command,
+            'payload': payload
         })
+        logging.debug(" [+] Send {}".format(message))
         return self.broker.send(message, app_data['queue'], host=app_data['host'])
 
     def process(self, message_data):
@@ -129,6 +137,10 @@ class API:
                     'Application {} has been successfully registered'.format(app_name),
                     app_data
                 )
+                yield from self.send_command('set token', {
+                        'token': app_data['token']
+                    }, app_data
+                )
 
         except Exception as e:
             yield from self.send_message(self.broker.ERROR, 'Error', app_data)
@@ -159,7 +171,12 @@ class API:
             deny = []
             for command in commands:
                 name, description = command
-                if not name in self.commands.keys():
+                if not name in self.commands.keys() and \
+                   not self.db.find_one(API.COMMANDS_COLLECTION_NAME, {
+                       'name': name,
+                       'app_token': app_token
+                   }
+                ):
                     self.commands[name] = (description, app_token)
                     self.db.insert(API.COMMANDS_COLLECTION_NAME, {
                         'name': name,
