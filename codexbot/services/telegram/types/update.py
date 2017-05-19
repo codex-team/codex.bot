@@ -41,7 +41,7 @@ class Update:
             if self.message.entities[i].type != 'bot_command':
                 continue
 
-            command_start = self.message.entities[i].offset
+            command_start = self.message.entities[i].offset + 1
             command_end = self.message.entities[i].offset + self.message.entities[i].length
 
             payload_start = command_end + 1

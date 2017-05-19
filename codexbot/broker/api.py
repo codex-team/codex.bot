@@ -40,7 +40,6 @@ class API:
         apps_list = self.db.find(API.APPS_COLLECTION_NAME, {})
         for app in apps_list:
             self.load_app(app)
-        logging.debug(self.apps)
 
     def load_app(self, app_data):
         """
@@ -70,7 +69,7 @@ class API:
 
     def send_message(self, code, message, app_data):
         """
-        Pack message with result code into JSON string and send to add_to_app_queue
+        Pack message with result code into JSON string and send to broker.add_to_app_queue
         :param code: status code
         :param message: message
         :param app_data: dictionary with 'queue' and 'host' parameters of the destination queue

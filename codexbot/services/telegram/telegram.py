@@ -49,7 +49,7 @@ class Telegram:
         update = Update(json)
 
         # Pass commands from message data to broker
-        await self.broker.process_service_msg({
+        await self.broker.service_to_app({
             'chat': update.message.chat.id,
             'service': self.__name__,
             'commands': update.get_commands()

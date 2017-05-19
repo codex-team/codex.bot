@@ -112,10 +112,3 @@ class Broker:
             chat_hash = chat['hash']
 
         return chat_hash
-
-
-
-
-
-
-
