@@ -6,21 +6,21 @@ import os
 from codexbot.lib.db import Db
 from codexbot.lib.logging import Logging
 from codexbot.broker.broker import Broker
-from codexbot.globalcfg import SERVER
+from codexbot.globalcfg import SERVER, DB
 from codexbot.lib.server import Server
 
 
 class Core:
 
     def __init__(self):
-        self.modules = {}
+        self.services = {}
 
         self.logging = Logging()
         self.event_loop = asyncio.get_event_loop()
         self.init_db()
         self.init_broker()
         self.init_server()
-        self.init_modules()
+        self.init_services()
         self.init_queue()
         self.server.start()
 
@@ -40,29 +40,29 @@ class Core:
         :return:
         """
         logging.debug("Initiate DB")
-        self.db = Db('default')
+        self.db = Db(DB['name'], DB['host'], DB['port'])
 
-    def init_modules(self):
+    def init_services(self):
         """
         Collects core modules from subdirectories
         :return:
         """
-        for module in filter(lambda x: not x.startswith('__'), os.listdir('codexbot/services')):
+        for service in filter(lambda x: not x.startswith('__'), os.listdir('codexbot/services')):
             try:
-                current_module = importlib.import_module("codexbot.services.{}".format(module))
+                current_service = importlib.import_module("codexbot.services.{}".format(service))
 
-                name = current_module.module_obj.__name__
-                if name in self.modules:
-                    raise Exception("Module {} is already registered.".format(name))
+                name = current_service.service_obj.__name__
+                if name in self.services:
+                    raise Exception("Service {} is already registered.".format(name))
 
-                self.modules[name] = current_module.module_obj
+                self.services[name] = current_service.service_obj
 
-                current_module.module_obj.run(self.broker)
+                current_service.service_obj.run(self.broker)
 
-                # set routes for this module
-                self.server.set_routes(current_module.module_obj.routes)
+                # set routes for this service
+                self.server.set_routes(current_service.service_obj.routes)
 
             except Exception as e:
                 logging.error(e)
 
-        logging.debug("{} modules loaded.".format(len(self.modules)))
+        logging.debug("{} services loaded.".format(len(self.services)))

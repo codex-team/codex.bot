@@ -20,7 +20,8 @@ class API:
         # Methods list (command => processor)
         self.methods = {
             'initialize app': self.initialize_app,
-            'register commands': self.register_commands
+            'register commands': self.register_commands,
+            'send to service': self.send_to_service
         }
         # List of registered commands
         self.commands = {
@@ -68,19 +69,27 @@ class API:
 
     def send_message(self, code, message, app_data):
         """
-        Pack message with result code into JSON string and send to broker.send
+        Pack message with result code into JSON string and send to broker.add_to_app_queue
         :param code: status code
         :param message: message
         :param app_data: dictionary with 'queue' and 'host' parameters of the destination queue
         :return:
         """
-        message = json.dumps({
+        payload = {
             'code': code,
             'message': message
-        })
-        return self.broker.send(message, app_data['queue'], host=app_data['host'])
+        }
+        return self.send_command('show message', payload, app_data)
 
-    def process(self, message_data):
+    def send_command(self, command, payload, app_data):
+        message = json.dumps({
+            'command': command,
+            'payload': payload
+        })
+        logging.debug(" [+] Send {}".format(message))
+        return self.broker.add_to_app_queue(message, app_data['queue'], host=app_data['host'])
+
+    async def process(self, message_data):
         """
         Process message with corresponding proccessor from self.methods by key in 'command' field
         :param message_data: dictionary with 'command', (app) 'token' and 'payload' keys
@@ -92,12 +101,12 @@ class API:
         """
         message_data = json.loads(message_data)
         app_token = message_data['token']
-        yield from self.methods[message_data['command']](app_token, message_data['payload'])
+        await self.methods[message_data['command']](app_token, message_data['payload'])
 
 
     #--# Callbacks #--#
 
-    def initialize_app(self, app_name, app_data):
+    async def initialize_app(self, app_name, app_data):
         """
         Initialize application.
         Responds with app_token if application was successfully registered.
@@ -114,7 +123,7 @@ class API:
         try:
             app = self.db.find_one(API.APPS_COLLECTION_NAME, {'name': app_data['name'], 'host': app_data['host']})
             if app:
-                yield from self.send_message(
+                await self.send_message(
                     self.broker.WRONG,
                     'Application {} is already registered'.format(app_name),
                     app_data
@@ -123,19 +132,23 @@ class API:
                 app_data['token'] = API.generate_app_token()
                 self.db.insert(API.APPS_COLLECTION_NAME, app_data)
                 self.load_app(app_data)
-                yield from self.send_message(
+                await self.send_message(
                     self.broker.OK,
                     'Application {} has been successfully registered'.format(app_name),
                     app_data
                 )
+                await self.send_command('set token', {
+                        'token': app_data['token']
+                    }, app_data
+                )
 
         except Exception as e:
-            yield from self.send_message(self.broker.ERROR, 'Error', app_data)
+            await self.send_message(self.broker.ERROR, 'Error', app_data)
             logging.error(e)
         else:
             logging.debug("Application {} initialized".format(app_name))
 
-    def register_commands(self, app_token, commands):
+    async def register_commands(self, app_token, commands):
         """
         Register list of commands as belongings to the application with app_token
         :param app_token: application token string
@@ -158,7 +171,11 @@ class API:
             deny = []
             for command in commands:
                 name, description = command
-                if not name in self.commands.keys():
+                if not name in self.commands.keys() and \
+                   not self.db.find_one(API.COMMANDS_COLLECTION_NAME, {
+                       'name': name
+                   }
+                ):
                     self.commands[name] = (description, app_token)
                     self.db.insert(API.COMMANDS_COLLECTION_NAME, {
                         'name': name,
@@ -170,7 +187,40 @@ class API:
                     deny.append(name)
 
         except Exception as e:
-            yield from self.send_message(self.broker.ERROR, 'Error', self.apps[app_token])
+            await self.send_message(self.broker.ERROR, 'Error', self.apps[app_token])
             logging.error(e)
         else:
             logging.debug("Application {} registered {} commands".format(app_name, commands_len - len(deny)))
+            await self.send_message(
+                self.broker.OK,
+                "Application {} registered {} commands".format(app_name, commands_len - len(deny)),
+                self.apps[app_token]
+            )
+
+    async def send_to_service(self, app_token, message_payload):
+        """
+        Find service by chat_hash and pass there message_payload:
+        :param message_payload:
+            - chat_hash  - chat hash
+            - text       - message text
+            - photo      - photo to send (you shouldn't pass text param if you want to send photo)
+            - caption    - caption for photo
+            For markups see https://core.telegram.org/bots/api#replykeyboardmarkup
+            - markup:
+                - keyboard
+                - inline_keyboard
+                - remove_keyboard
+                - force_reply
+        
+        :param app_token: 
+        :return: 
+        """
+        chat_hash = message_payload['chat_hash']
+
+        chat = self.db.find_one('chats', {hash: chat_hash})
+
+        if not chat:
+            await self.send_message(self.broker.WRONG, 'Error', self.apps[app_token])
+            return
+
+        self.broker.core.services[chat['service']].add_to_app_queue(chat['id'], message_payload)

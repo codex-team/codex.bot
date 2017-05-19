@@ -14,3 +14,10 @@ SERVER = {
 RABBITMQ = {
     'host': '127.0.0.1',
 }
+
+# DB settings
+DB = {
+    'name': 'default',
+    'host': '127.0.0.1',
+    'port': 27017
+}
