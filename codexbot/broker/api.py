@@ -70,7 +70,7 @@ class API:
 
     def send_message(self, code, message, app_data):
         """
-        Pack message with result code into JSON string and send to broker.send
+        Pack message with result code into JSON string and send to broker.answer
         :param code: status code
         :param message: message
         :param app_data: dictionary with 'queue' and 'host' parameters of the destination queue
@@ -88,7 +88,7 @@ class API:
             'payload': payload
         })
         logging.debug(" [+] Send {}".format(message))
-        return self.broker.send(message, app_data['queue'], host=app_data['host'])
+        return self.broker.answer(message, app_data['queue'], host=app_data['host'])
 
     def process(self, message_data):
         """

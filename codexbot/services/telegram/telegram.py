@@ -45,8 +45,10 @@ class Telegram:
         """
         logging.info("Got telegram callback {} {} {}".format(text, post, json))
 
+        # Parse telegram message
         update = Update(json)
 
+        # Pass commands from message data to broker
         self.broker.service_handler({
             'chat': update.message.chat.id,
             'service': self.__name__,

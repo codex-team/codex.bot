@@ -37,8 +37,13 @@ class Broker:
             logging.error("Broker callback error")
             logging.error(e)
 
-    def service_handler(self, message_data):
-
+    def process_service_msg(self, message_data):
+        """
+        Find application to send message data and send it.
+        
+        :param message_data: 
+        :return: 
+        """
         chat = self.core.db.find_one('chats', {'id': message_data['chat']})
 
         if not chat:
@@ -71,12 +76,9 @@ class Broker:
 
             self.send(message, app['queue'], app['host'])
 
-
-
-
     def send(self, message, queue_name, host='localhost'):
         """
-        Send message to queue on the host
+        Send message to app queue on the host 
         :param message: message string
         :param queue_name: name of destination queue
         :param host: destination host address
@@ -84,9 +86,27 @@ class Broker:
         """
         self.event_loop.run_until_complete(add_message_to_queue(message, queue_name, host=host))
 
+    def answer(self, message, queue_name, host='localhost'):
+        """
+        Send answer to app queue from callback
+        :param message: message string
+        :param queue_name: name of destination queue
+        :param host: destination host address
+        :return:
+        """
+        yield from add_message_to_queue(message, queue_name, host=host)
+
     def start(self):
         """
         Receive all messages from 'core' queue to self.callback
         :return:
         """
         self.event_loop.run_until_complete(init_receiver(self.callback, "core"))
+
+
+
+
+
+
+
+
