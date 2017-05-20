@@ -100,7 +100,7 @@ class Telegram:
             message = message_payload['text']
             if 'markup' in message_payload:
                 self.message.set_reply_markup(*message_payload['markup'])
-            self.message.send(message)
+            self.message.send(chat_id, message)
             return
 
         if 'photo' in message_payload:
@@ -110,5 +110,5 @@ class Telegram:
                 caption = message_payload['caption']
             if 'markup' in message_payload:
                 self.photo.set_reply_markup(*message_payload['markup'])
-            self.photo.send(photo, caption)
+            self.photo.send(chat_id, photo, caption)
             return

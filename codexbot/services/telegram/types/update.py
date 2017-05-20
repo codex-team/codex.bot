@@ -35,19 +35,23 @@ class Update:
             return []
 
         commands = []
+        command_entities = []
+        for entity in self.message.entities:
+            if entity.type == 'bot_command':
+                command_entities.append(entity)
 
-        for i in range(0, len(self.message.entities)):
+        for i in range(0, len(command_entities)):
 
-            if self.message.entities[i].type != 'bot_command':
+            if command_entities[i].type != 'bot_command':
                 continue
 
-            command_start = self.message.entities[i].offset + 1
-            command_end = self.message.entities[i].offset + self.message.entities[i].length
+            command_start = command_entities[i].offset + 1
+            command_end = command_entities[i].offset + command_entities[i].length
 
             payload_start = command_end + 1
 
-            if i < len(self.message.entities) - 1:
-                payload_end = self.message.entities[i+1].offset - 1
+            if i < len(command_entities) - 1:
+                payload_end = command_entities[i+1].offset - 1
             else:
                 payload_end = None
 
