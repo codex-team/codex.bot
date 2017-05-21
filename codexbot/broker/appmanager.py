@@ -19,6 +19,9 @@ class AppManager:
     def add_app(self, chat_hash, app_data):
         """
         Register new app by command /newapp {app_name} {app_host}
+        app_name - name of new app.
+        app_host - url or ip of app`s host
+        Name and host shouldn't contain spaces
         
         :param chat_hash: chat_hash from broker
         :param app_data: [app_name, app_host]            
@@ -28,9 +31,11 @@ class AppManager:
         app_data = app_data.split(' ')
 
         if len(app_data) < 2:
-            message = 'You should pass name and host of your app without spaces'
+            message = 'You should pass name and host of your app in format /newapp {name} {host}. ' \
+                      'Name and host should\'t contain spaces'
         elif len(app_data) > 2:
-            message = 'You should pass only name and host of your app without spaces'
+            message = 'You should pass only name and host of your app in format /newapp {name} {host}. ' \
+                      'Name and host shouldn\'t contain spaces'
         else:
             app_name = app_data[0]
             app_host = app_data[1]
