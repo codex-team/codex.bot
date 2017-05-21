@@ -17,6 +17,13 @@ class AppManager:
         }
 
     def add_app(self, chat_hash, app_data):
+        """
+        Register new app by command /newapp {app_name} {app_host}
+        
+        :param chat_hash: chat_hash from broker
+        :param app_data: [app_name, app_host]            
+        :return: 
+        """
         chat = self.db.find_one('chats', {'hash': chat_hash})
         app_data = app_data.split(' ')
 
@@ -25,16 +32,19 @@ class AppManager:
         elif len(app_data) > 2:
             message = 'You should pass only name and host of your app without spaces'
         else:
-            app = self.db.find_one(self.api.APPS_COLLECTION_NAME, {'name': app_data[0]})
+            app_name = app_data[0]
+            app_host = app_data[1]
+
+            app = self.db.find_one(self.api.APPS_COLLECTION_NAME, {'name': app_name})
             if app:
-                message = 'App {} already exists'.format(app_data[0])
+                message = 'App {} already exists'.format(app_name)
             else:
 
                 app = {
                     'token': self.generate_app_token(),
-                    'name': app_data[0],
-                    'queue': app_data[0],
-                    'host': app_data[1],
+                    'name': app_name,
+                    'queue': app_name,
+                    'host': app_host,
                     'port': 80,
                     'owner': chat_hash
                 }
@@ -49,6 +59,13 @@ class AppManager:
         )
 
     def show_apps(self, chat_hash, command_payload):
+        """
+        Get all registered apps by owner field
+        
+        :param chat_hash: hash of app`s owner chat
+        :param command_payload: empty
+        :return: 
+        """
         apps = self.db.find(self.api.APPS_COLLECTION_NAME, {'owner': chat_hash})
         chat = self.db.find_one('chats', {'hash': chat_hash})
 
