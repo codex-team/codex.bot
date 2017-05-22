@@ -6,6 +6,7 @@ import string
 
 from codexbot.lib.rabbitmq import add_message_to_queue, init_receiver
 from .api import API
+from .appmanager import AppManager
 
 
 class Broker:
@@ -19,6 +20,7 @@ class Broker:
         self.core = core
         self.event_loop = event_loop
         self.api = API(self)
+        self.app_manager = AppManager(self)
 
     async def callback(self, channel, body, envelope, properties):
         """
@@ -47,6 +49,10 @@ class Broker:
         chat_hash = self.get_chat_hash(message_data)
 
         for incoming_cmd in message_data['commands']:
+
+            if incoming_cmd['command'] in self.app_manager.commands:
+                self.app_manager.process(chat_hash, incoming_cmd)
+                continue
 
             app_cmd = self.core.db.find_one(self.api.COMMANDS_COLLECTION_NAME, {
                 'name': incoming_cmd['command']

@@ -19,7 +19,6 @@ class API:
 
         # Methods list (command => processor)
         self.methods = {
-            'initialize app': self.initialize_app,
             'register commands': self.register_commands,
             'send to service': self.send_to_service
         }
@@ -55,17 +54,6 @@ class API:
         """
         if not app_data['token'] in self.apps:
             self.apps[app_data['token']] = app_data
-
-    @staticmethod
-    def generate_app_token(size=8, chars=string.ascii_uppercase + string.digits):
-        """
-        Generate unique string
-        Application will use this token for authentication
-        :param size: size in symbols
-        :param chars: letters used
-        :return: string token
-        """
-        return ''.join(random.SystemRandom().choice(chars) for _ in range(size))
 
     def send_message(self, code, message, app_data):
         """
@@ -106,47 +94,7 @@ class API:
 
     #--# Callbacks #--#
 
-    async def initialize_app(self, app_name, app_data):
-        """
-        Initialize application.
-        Responds with app_token if application was successfully registered.
-        Responds with error (code and message) if application has been already registered.
-        :param app_name:
-        :param app_data: dict
-            'name':         application name,
-            'queue':        queue name,
-            'host':         application host address,
-            'port':         application port,
-            'description':  application description in messenger
-        :return:
-        """
-        try:
-            app = self.db.find_one(API.APPS_COLLECTION_NAME, {'name': app_data['name'], 'host': app_data['host']})
-            if app:
-                await self.send_message(
-                    self.broker.WRONG,
-                    'Application {} is already registered'.format(app_name),
-                    app_data
-                )
-            else:
-                app_data['token'] = API.generate_app_token()
-                self.db.insert(API.APPS_COLLECTION_NAME, app_data)
-                self.load_app(app_data)
-                await self.send_message(
-                    self.broker.OK,
-                    'Application {} has been successfully registered'.format(app_name),
-                    app_data
-                )
-                await self.send_command('set token', {
-                        'token': app_data['token']
-                    }, app_data
-                )
 
-        except Exception as e:
-            await self.send_message(self.broker.ERROR, 'Error', app_data)
-            logging.error(e)
-        else:
-            logging.debug("Application {} initialized".format(app_name))
 
     async def register_commands(self, app_token, commands):
         """
