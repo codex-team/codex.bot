@@ -142,7 +142,7 @@ class Broker:
                 {
                     'id': message_data['user']['id'],
                     'hash': user_hash,
-                    'username': message_data['user']['user_name'],
+                    'username': message_data['user']['username'],
                     'lang': message_data['user']['lang'],
                     'service': message_data['service']
                 }
