@@ -47,6 +47,7 @@ class Broker:
         """
 
         chat_hash = self.get_chat_hash(message_data)
+        user_hash = self.get_user_hash(message_data)
 
         for incoming_cmd in message_data['commands']:
 
@@ -70,7 +71,8 @@ class Broker:
                 'payload': {
                     'command': incoming_cmd['command'],
                     'params': incoming_cmd['payload'],
-                    'chat': chat_hash
+                    'chat': chat_hash,
+                    'user': user_hash
                 }
             })
 
@@ -101,7 +103,7 @@ class Broker:
         :return: 
         """
 
-        chat = self.core.db.find_one('chats', {'id': message_data['chat']})
+        chat = self.core.db.find_one('chats', {'id': message_data['chat']['id']})
 
         if not chat:
             chat_hash = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(8))
@@ -109,12 +111,41 @@ class Broker:
             self.core.db.insert(
                 'chats',
                 {
-                    'id': message_data['chat'],
-                     'hash': chat_hash,
-                     'service': message_data['service']
+                    'id': message_data['chat']['id'],
+                    'type': message_data['chat']['type'],
+                    'hash': chat_hash,
+                    'service': message_data['service']
                 }
             )
         else:
             chat_hash = chat['hash']
 
         return chat_hash
+
+    def get_user_hash(self, message_data):
+        """
+        Search user_hash in db. If hash not found, generate new and insert it to db
+
+        :param message_data: 
+        :return: 
+        """
+
+        user = self.core.db.find_one('users', {'id': message_data['user']['id']})
+
+        if not user:
+            user_hash = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(8))
+
+            self.core.db.insert(
+                'users',
+                {
+                    'id': message_data['user']['id'],
+                    'hash': user_hash,
+                    'username': message_data['user']['user_name'],
+                    'lang': message_data['user']['lang'],
+                    'service': message_data['service']
+                }
+            )
+        else:
+            user_hash = user['hash']
+
+        return user_hash
