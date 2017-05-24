@@ -10,17 +10,18 @@ class Message:
     __name__ = "Telegram Message"
 
     # TODO: добавить все поля в соответствии с https://core.telegram.org/bots/api#message
-    user = None
-    forward_from = None
-    forward_from_chat = None
-    forward_from_message_id = None
-    forward_date = None
-    reply_to_message = None
-    edit_date = None
-    text = None
-    entities = []
 
     def __init__(self, data):
+
+        self.user = None
+        self.forward_from = None
+        self.forward_from_chat = None
+        self.forward_from_message_id = None
+        self.forward_date = None
+        self.reply_to_message = None
+        self.edit_date = None
+        self.text = None
+        self.entities = []
 
         if type(data) == str:
             data = loads(data)

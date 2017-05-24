@@ -6,10 +6,10 @@ class User:
     # https://core.telegram.org/bots/api#user
     __name__ = "Telegram User"
 
-    last_name = None
-    username = None
-
     def __init__(self, data):
+
+        self.last_name = None
+        self.username = None
 
         if type(data) == str:
             data = loads(data)

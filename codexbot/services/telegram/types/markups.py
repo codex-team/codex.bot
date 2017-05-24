@@ -4,7 +4,9 @@ class Base:
     """
 
     __name__ = "Telegram keyboards interface"
-    keyboard = []
+
+    def __init__(self):
+        self.keyboard = []
 
     def row(self, *args):
         """

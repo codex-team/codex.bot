@@ -7,10 +7,10 @@ class MessageEntity:
     # https://core.telegram.org/bots/api#messageentity
     __name__ = "Telegram Message Entity"
 
-    url = None
-    user = None
-
     def __init__(self, data):
+
+        self.url = None
+        self.user = None
 
         if type(data) is str:
             data = loads(data)
