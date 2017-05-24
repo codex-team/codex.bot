@@ -2,6 +2,7 @@ import asyncio
 import importlib
 import logging
 import os
+import gettext
 
 from codexbot.lib.db import Db
 from codexbot.lib.logging import Logging
@@ -16,6 +17,7 @@ class Core:
         self.services = {}
 
         self.logging = Logging()
+        self.init_i18n()
         self.event_loop = asyncio.get_event_loop()
         self.init_db()
         self.init_broker()
@@ -23,6 +25,10 @@ class Core:
         self.init_services()
         self.init_queue()
         self.server.start()
+
+    def init_i18n(self):
+        gettext.translation('main', 'i18n', ['ru']).install()
+        logging.debug("Initiate i18n.")
 
     def init_queue(self):
         logging.debug("Initiate queue and loop.")
@@ -39,7 +45,7 @@ class Core:
         Initialize self.db object with 'default' database name
         :return:
         """
-        logging.debug("Initiate DB")
+        logging.debug("Initiate DB.")
         self.db = Db(DB['name'], DB['host'], DB['port'])
 
     def init_services(self):
