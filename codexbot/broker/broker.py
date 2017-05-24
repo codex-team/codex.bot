@@ -7,6 +7,7 @@ import string
 from codexbot.lib.rabbitmq import add_message_to_queue, init_receiver
 from .api import API
 from .appmanager import AppManager
+from codexbot.globalcfg import RABBITMQ
 
 
 class Broker:
@@ -78,7 +79,7 @@ class Broker:
 
             await self.add_to_app_queue(message, app['queue'], app['host'])
 
-    async def add_to_app_queue(self, message, queue_name, host='localhost'):
+    async def add_to_app_queue(self, message, queue_name, host):
         """
         Send message to app queue on the host 
         :param message: message string
@@ -86,6 +87,7 @@ class Broker:
         :param host: destination host address
         :return:
         """
+        logging.debug('Now i pass message {} to the {} queue'.format(message, queue_name))
         await add_message_to_queue(message, queue_name, host)
 
     def start(self):
@@ -93,7 +95,7 @@ class Broker:
         Receive all messages from 'core' queue to self.callback
         :return:
         """
-        self.event_loop.run_until_complete(init_receiver(self.callback, "core"))
+        self.event_loop.run_until_complete(init_receiver(self.callback, "core", RABBITMQ['host']))
 
     def get_chat_hash(self, message_data):
         """
