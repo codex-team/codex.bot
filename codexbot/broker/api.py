@@ -165,10 +165,10 @@ class API:
         """
         chat_hash = message_payload['chat_hash']
 
-        chat = self.db.find_one('chats', {hash: chat_hash})
+        chat = self.db.find_one('chats', {'hash': chat_hash})
 
         if not chat:
             await self.send_message(self.broker.WRONG, 'Error', self.apps[app_token])
             return
 
-        self.broker.core.services[chat['service']].add_to_app_queue(chat['id'], message_payload)
+        self.broker.core.services[chat['service']].send(chat['id'], message_payload)
