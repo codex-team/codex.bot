@@ -10,6 +10,7 @@ class User:
 
         self.last_name = None
         self.username = None
+        self.language_code = None
 
         if type(data) == str:
             data = loads(data)
@@ -22,3 +23,6 @@ class User:
 
         if 'username' in data:
             self.username = data['username']
+
+        if 'language_code' in data:
+            self.language_code = data['language_code']

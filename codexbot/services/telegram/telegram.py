@@ -48,9 +48,22 @@ class Telegram:
         # Parse telegram message
         update = Update(json)
 
+        if update.message.user.username:
+            username = update.message.user.username
+        else:
+            username = update.message.user.first_name
+
         # Pass commands from message data to broker
         await self.broker.service_to_app({
-            'chat': update.message.chat.id,
+            'chat': {
+                'id': update.message.chat.id,
+                'type': update.message.chat.type
+            },
+            'user': {
+                'id': update.message.user.id,
+                'username': username,
+                'lang': update.message.user.language_code
+            },
             'service': self.__name__,
             'commands': update.get_commands()
         })
