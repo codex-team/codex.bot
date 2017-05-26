@@ -65,7 +65,8 @@ class Telegram:
                 'lang': update.message.user.language_code
             },
             'service': self.__name__,
-            'commands': update.get_commands()
+            'commands': update.get_commands(),
+            'text': update.message.text
         })
 
         return True

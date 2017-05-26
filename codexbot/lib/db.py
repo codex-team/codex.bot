@@ -54,10 +54,13 @@ class Db():
         """
         return self.db[collection].insert(data)
 
-    def remove(self, collection):
+    def remove(self, collection, query):
         """
         Remove collection from db
         :param collection: collection name
         :return:
         """
-        return self.db[collection].remove()
+        return self.db[collection].remove(query)
+
+    def update(self, collection, find_params, update_params, upsert=False):
+        return self.db[collection].update(find_params, update_params, upsert=upsert)

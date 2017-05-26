@@ -50,6 +50,27 @@ class Broker:
         chat_hash = self.get_chat_hash(message_data)
         user_hash = self.get_user_hash(message_data)
 
+        key = user_hash + chat_hash
+
+        # If there are state for user in current chat, pass message to app
+        if key in self.api.states:
+
+            app = self.api.apps[self.api.states[key]['app']]
+
+            message = json.dumps({
+                'command': 'service callback',
+                'payload': {
+                    'command': 'text/plain',
+                    'params': message_data['text'],
+                    'chat': chat_hash,
+                    'user': user_hash
+                }
+            })
+
+            self.api.reset_state(self.api.states[key])
+            await self.add_to_app_queue(message, app['queue'], app['host'])
+            return
+
         for incoming_cmd in message_data['commands']:
 
             if incoming_cmd['command'] in self.app_manager.commands:

@@ -7,9 +7,9 @@ import logging
 
 
 class API:
-
     APPS_COLLECTION_NAME = 'apps'
     COMMANDS_COLLECTION_NAME = 'commands'
+    STATES_COLLECTION_NAME = 'states'
 
     def __init__(self, broker):
 
@@ -20,7 +20,8 @@ class API:
         # Methods list (command => processor)
         self.methods = {
             'register commands': self.register_commands,
-            'send to service': self.send_to_service
+            'send to service': self.send_to_service,
+            'wait user answer': self.wait_user_answer
         }
         # List of registered commands
         self.commands = {
@@ -30,6 +31,9 @@ class API:
         # Generate list of applications (self.apps)
         self.apps = {}
         self.load_apps()
+
+        self.states = {}
+        self.load_states()
 
     def load_apps(self):
         """
@@ -54,6 +58,39 @@ class API:
         """
         if not app_data['token'] in self.apps:
             self.apps[app_data['token']] = app_data
+
+    def load_state(self, state):
+        """
+        Add state to the local self.states cache
+        
+        :param state: 
+            - user - user hash
+            - chat - chat hash
+            - app - app token
+        :return: 
+        """
+        key = state['user'] + state['chat']
+        self.states[key] = state
+
+    def reset_state(self, state):
+        """
+        Remove state from db and from cache
+        :param state: 
+        :return: 
+        """
+
+        self.db.remove(API.STATES_COLLECTION_NAME, state)
+        self.states.pop(state['user']+state['chat'], None)
+
+    def load_states(self):
+        """
+        Load stored states
+        :return: 
+        """
+
+        states_list = self.db.find(API.STATES_COLLECTION_NAME, {})
+        for state in states_list:
+            self.load_state(state)
 
     def send_message(self, code, message, app_data):
         """
@@ -172,3 +209,34 @@ class API:
             return
 
         self.broker.core.services[chat['service']].send(chat['id'], message_payload)
+
+    async def wait_user_answer(self, app_token, state_data):
+        """
+        Add new state for state_data['user'] in state_data['chat']
+        
+        :param app_token: 
+        :param state_data: 
+        :return: 
+        """
+
+        if 'chat' not in state_data or 'user' not in state_data:
+            await self.send_message(self.broker.WRONG, 'Error', self.apps[app_token])
+            return
+
+        self.db.update(API.STATES_COLLECTION_NAME,
+               {
+                   'chat': state_data['chat'],
+                   'user': state_data['user']
+               },
+               {
+                   'chat': state_data['chat'],
+                   'user': state_data['user'],
+                   'app': app_token
+               },
+               True  # upsert
+        )
+
+        state_data['app'] = app_token
+        self.load_state(state_data)
+
+        await self.send_message(self.broker.OK, 'State registered', self.apps[app_token])
