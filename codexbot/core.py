@@ -26,6 +26,8 @@ class Core:
         self.init_queue()
         self.server.start()
 
+    # TODO создать отдельный модуль для подключения словарей к модулям
+    #      но это не точно
     def init_i18n(self):
         gettext.translation('main', 'i18n', ['ru']).install()
         logging.debug("Initiate i18n.")
