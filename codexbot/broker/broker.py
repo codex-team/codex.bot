@@ -50,12 +50,12 @@ class Broker:
         chat_hash = self.get_chat_hash(message_data)
         user_hash = self.get_user_hash(message_data)
 
-        key = user_hash + chat_hash
+        key = API.get_pending_app_key({'user': user_hash, 'chat': chat_hash})
 
-        # If there are state for user in current chat, pass message to app
-        if key in self.api.states:
+        # If there are pending app for user in current chat, pass message to app
+        if key in self.api.pending_apps:
 
-            app = self.api.apps[self.api.states[key]['app']]
+            app = self.api.apps[self.api.pending_apps[key]['app']]
 
             payload = {
                 'text': message_data['text'],
@@ -63,7 +63,7 @@ class Broker:
                 'user': user_hash
             }
 
-            self.api.reset_state(self.api.states[key])
+            self.api.reset_pending(self.api.pending_apps[key])
             await self.api.send_command('user answer', payload, app)
             return
 
