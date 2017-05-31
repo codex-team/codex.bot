@@ -239,4 +239,8 @@ class API:
         state_data['app'] = app_token
         self.load_state(state_data)
 
+        if len(state_data['prompt']):
+            chat = self.db.find_one('chats', {'hash': state_data['chat']})
+            self.broker.core.services[chat['service']].send(chat['id'], {'text': state_data['prompt']})
+
         await self.send_message(self.broker.OK, 'State registered', self.apps[app_token])
