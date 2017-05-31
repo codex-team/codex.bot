@@ -7,9 +7,9 @@ import logging
 
 
 class API:
-
     APPS_COLLECTION_NAME = 'apps'
     COMMANDS_COLLECTION_NAME = 'commands'
+    PENDING_APPS_COLLECTION_NAME = 'pending_apps'
 
     def __init__(self, broker):
 
@@ -20,7 +20,8 @@ class API:
         # Methods list (command => processor)
         self.methods = {
             'register commands': self.register_commands,
-            'send to service': self.send_to_service
+            'send to service': self.send_to_service,
+            'wait user answer': self.wait_user_answer
         }
         # List of registered commands
         self.commands = {
@@ -30,6 +31,9 @@ class API:
         # Generate list of applications (self.apps)
         self.apps = {}
         self.load_apps()
+
+        self.pending_apps = {}
+        self.load_pending_apps()
 
     def load_apps(self):
         """
@@ -54,6 +58,41 @@ class API:
         """
         if not app_data['token'] in self.apps:
             self.apps[app_data['token']] = app_data
+
+    def set_pending(self, app):
+        """
+        Add app to the local self.pending_apps cache
+        
+        :param pending_data:
+            - user - user hash
+            - chat - chat hash
+            - app - app token
+        :return: 
+        """
+        key = self.get_pending_app_key(app)
+        self.pending_apps[key] = app
+
+    def reset_pending(self, app):
+        """
+        Remove app from db and from cache
+        :param app:
+        :return: 
+        """
+
+        self.db.remove(API.PENDING_APPS_COLLECTION_NAME, app)
+
+        key = self.get_pending_app_key(app)
+        self.pending_apps.pop(key, None)
+
+    def load_pending_apps(self):
+        """
+        Load stored pending_apps
+        :return: 
+        """
+
+        apps = self.db.find(API.PENDING_APPS_COLLECTION_NAME, {})
+        for app in apps:
+            self.set_pending(app)
 
     def send_message(self, code, message, app_data):
         """
@@ -91,8 +130,7 @@ class API:
         app_token = message_data['token']
         await self.methods[message_data['command']](app_token, message_data['payload'])
 
-
-    #--# Callbacks #--#
+    # --# Callbacks #--#
 
 
 
@@ -172,3 +210,42 @@ class API:
             return
 
         self.broker.core.services[chat['service']].send(chat['id'], message_payload)
+
+    async def wait_user_answer(self, app_token, payload):
+        """
+        Add pending state for payload['user'] in payload['chat']
+        
+        :param app_token: 
+        :param payload:
+        :return: 
+        """
+
+        if 'chat' not in payload or 'user' not in payload:
+            await self.send_message(self.broker.WRONG, 'Error', self.apps[app_token])
+            return
+
+        self.db.update(API.PENDING_APPS_COLLECTION_NAME,
+                       {
+                           'chat': payload['chat'],
+                           'user': payload['user']
+                       },
+                       {
+                           'chat': payload['chat'],
+                           'user': payload['user'],
+                           'app': app_token
+                       },
+                       True  # upsert
+                       )
+
+        payload['app'] = app_token
+        self.set_pending(payload)
+
+        if len(payload['prompt']):
+            chat = self.db.find_one('chats', {'hash': payload['chat']})
+            self.broker.core.services[chat['service']].send(chat['id'], {'text': payload['prompt']})
+
+        await self.send_message(self.broker.OK, 'Pending state for app registered', self.apps[app_token])
+
+    @staticmethod
+    def get_pending_app_key(app):
+        return app['user'] + ':' + app['chat']
