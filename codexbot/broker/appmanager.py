@@ -63,7 +63,7 @@ class AppManager:
                 self.generate_app_token()
                 self.db.insert(self.api.APPS_COLLECTION_NAME, app)
                 self.api.load_app(app)
-                message = _('Your app was successfully registered. Your token - {}.').format(app['token'])
+                message = _('Your app was successfully registered. Your token - {}').format(app['token'])
 
         self.core.services[chat['service']].send(
             chat['id'],
