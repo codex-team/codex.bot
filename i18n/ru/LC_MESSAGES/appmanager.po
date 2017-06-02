@@ -1,0 +1,28 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "You should pass name and host of your app in format /newapp {name} {host}."
+msgstr "Следует использовать имя приложения и хост в формате /newapp {name} {host}."
+
+msgid "Name and host should not contain spaces."
+msgstr "Имя приложения и хост не должны содержать пробелы."
+
+msgid "You should pass only name and host of your app in format /newapp {name} {host}."
+msgstr "Следует использовать только имя приложения и хост в формате /newapp {name} {host}."
+
+msgid "Your app was successfully registered. Your token - {}"
+msgstr "Приложение успешно подключено. Токен — {}"
+
+msgid "App {} already exists."
+msgstr "Приложение {} уже существует."
+
+msgid "Your apps: \n\n"
+msgstr "Ваши приложения: \n\n"
+
+msgid "{}\nToken: {}\nHost: {}\nQueue: {}\n---------\n"
+msgstr "{}\nТокен: {}\nХост: {}\nОчередь: {}\n---------\n"
+
+msgid "There are no registered apps. Add new app using command /newapp {name} {host}."
+msgstr "Нет ни одного подключенного приложения. Добавьте новое, используя команду /newapp {name} {host}."

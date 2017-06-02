@@ -9,7 +9,18 @@ class Video(Base):
 
     @message
     def send(self, video, caption=None, duration=None, width=None, height=None, **kwargs):
-
+        """
+        Send video to chat
+        Use @message decorator
+        
+        :param video: path to file
+        :param caption: 
+        :param duration: 
+        :param width: 
+        :param height: 
+        :param kwargs: 
+        :return: 
+        """
         if not video:
             raise Exception('Video is required')
 
