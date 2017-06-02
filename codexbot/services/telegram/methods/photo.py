@@ -13,7 +13,7 @@ class Photo(Base):
         Send photo to chat
         Use @message decorator
         
-        :param photo: path to file
+        :param photo: url to image
         :param caption: 
         :param kwargs: 
         :return: 
@@ -22,10 +22,8 @@ class Photo(Base):
         if not photo:
             raise Exception('Photo is required')
 
-        payload = {}
-
-        files = {
-            'photo': open(photo, 'rb'),
+        payload = {
+            'photo': photo
         }
 
         if caption:
@@ -33,6 +31,5 @@ class Photo(Base):
 
         return {
             'payload': payload,
-            'files': files,
             'method': self.method
         }
