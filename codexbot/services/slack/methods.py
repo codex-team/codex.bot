@@ -16,10 +16,17 @@ def channels_list(slack_client):
     return None
 
 
-def send_message(slack_client, channel_id, message):
+def send_message(slack_client, channel_id, message, emoji):
     slack_client.api_call(
         "chat.postMessage",
         channel=channel_id,
         text=message,
+        icon_emoji=':' + emoji,
         as_user=True
     )
+
+def channels_info(slack_client, channel_id):
+    channel_info = slack_client.api_call("channels.info", channel=channel_id)
+    if channel_info:
+        return channel_info
+    return None
