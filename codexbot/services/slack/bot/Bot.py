@@ -1,7 +1,7 @@
 import logging
 
 from slackclient import SlackClient
-from .config import BOT_NAME, CLIENT_ID, CLIENT_SECRET, VERIFICATION
+from codexbot.services.slack.config.config import BOT_NAME, CLIENT_ID, CLIENT_SECRET, VERIFICATION
 
 authed_teams = {}
 
@@ -18,7 +18,7 @@ class Bot():
         }
 
         self.verification = VERIFICATION
-        self.client = SlackClient("")
+        self.client = SlackClient("xoxb-191736210752-S5taEvseHbty11UZWPwj5R4T")
 
     def auth(self, code):
 
@@ -31,7 +31,7 @@ class Bot():
 
         team_id = auth_response["team_id"]
         authed_teams[team_id] = {
-            "bot_token":auth_response["bot"]["bot_access_token"]
+            "bot_token" : auth_response["bot"]["bot_access_token"]
         }
 
         self.__token = authed_teams[team_id]["bot_token"]
