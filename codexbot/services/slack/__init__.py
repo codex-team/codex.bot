@@ -1,3 +1,3 @@
 from .slack import Slack
 
-module_obj = Slack()
+service_obj = Slack()
