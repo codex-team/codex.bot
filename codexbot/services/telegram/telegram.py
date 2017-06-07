@@ -98,6 +98,7 @@ class Telegram:
          :param message_payload:
             - chat_hash  - chat hash
             - text       - message text
+            - parse_mode - message parse mode type
             - photo      - photo to send (you shouldn't pass text param if you want to send photo)
             - caption    - caption for photo
             For markups see https://core.telegram.org/bots/api#replykeyboardmarkup
@@ -112,9 +113,13 @@ class Telegram:
         """
         if 'text' in message_payload:
             message = message_payload['text']
+
+            parse_mode = message_payload.get('parse_mode', None)
+
             if 'markup' in message_payload:
                 self.message.set_reply_markup(*message_payload['markup'])
-            self.message.send(chat_id, message)
+
+            self.message.send(chat_id, message, parse_mode)
             return
 
         if 'photo' in message_payload:
