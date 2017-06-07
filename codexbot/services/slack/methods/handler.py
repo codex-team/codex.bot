@@ -1,20 +1,37 @@
 from .message import Message
+from codexbot.services.slack.bot.Bot import Bot
 
 
 class Handler():
-    def __init__(self, slack_client, slack_event):
-        self.slack_client = slack_client
+    def __init__(self, slack_event):
         self.slack_event  = slack_event
+        self.slackBot = Bot()
 
         self.handle(self.slack_event)
 
     def handle(self, slack_event):
 
         event = slack_event.get('event')
-        print(event)
+
         if event.get('type') == 'message':
             message = Message()
             message.getMessage(event)
+            channel_id = event.get('channel')
+
+            # this is bot message
+            # do not listen
+            if not event.get('bot_id') and not event.get('bot_message'):
+                attachment = {
+                            "title":"App hangs on reboot",
+                            "title_link": "http://domain.com/ticket/123456",
+                            "text": "If I restart my computer without quitting your app, it stops the reboot sequence.\nhttp://domain.com/ticket/123456",
+                        }
+                self.slackBot.client.api_call(
+                    "chat.postMessage",
+                    channel=channel_id,
+                    text='Would you like to play a game?',
+                    attachments=[attachment]
+                )
 
         if event.get('type') == 'reaction_removed':
             print('reaction removed')
