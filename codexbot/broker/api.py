@@ -189,6 +189,7 @@ class API:
         :param message_payload:
             - chat_hash  - chat hash
             - text       - message text
+            - parse_mode - message parse mode type
             - photo      - photo to send (you shouldn't pass text param if you want to send photo)
             - caption    - caption for photo
             For markups see https://core.telegram.org/bots/api#replykeyboardmarkup
