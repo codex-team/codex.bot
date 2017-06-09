@@ -39,7 +39,7 @@ class Broker:
             logging.error("Broker callback error")
             logging.error(e)
 
-    async def service_to_app(self, message_data):
+    async def commands_to_app(self, message_data):
         """
         Find application by command and send there message data.
         
@@ -95,6 +95,22 @@ class Broker:
             })
 
             await self.add_to_app_queue(message, app['queue'], app['host'])
+
+    async def callback_query_to_app(self, query):
+        (app_token, data) = query['data'].split(' ', 1)
+
+        app = self.api.apps[app_token]
+        chat_hash = self.get_chat_hash(query)
+        user_hash = self.get_user_hash(query)
+
+
+        payload = {
+            'data': data,
+            'chat': chat_hash,
+            'user': user_hash,
+        }
+
+        await self.api.send_command('callback query', payload, app)
 
     async def add_to_app_queue(self, message, queue_name, host):
         """

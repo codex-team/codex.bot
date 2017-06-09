@@ -48,13 +48,21 @@ class Telegram:
         # Parse telegram message
         update = Update(json)
 
+        if update.message:
+            await self.send_message_to_app(update)
+        elif update.callback_query:
+            await self.send_callback_query_to_app(update)
+
+        return True
+
+    async def send_message_to_app(self, update):
         if update.message.user.username:
             username = update.message.user.username
         else:
             username = update.message.user.first_name
 
         # Pass commands from message data to broker
-        await self.broker.service_to_app({
+        await self.broker.commands_to_app({
             'chat': {
                 'id': update.message.chat.id,
                 'type': update.message.chat.type
@@ -69,7 +77,25 @@ class Telegram:
             'text': update.message.text
         })
 
-        return True
+    async def send_callback_query_to_app(self, update):
+        if update.callback_query.user.username:
+            username = update.callback_query.user.username
+        else:
+            username = update.callback_query.user.first_name
+
+        await self.broker.callback_query_to_app({
+            'chat': {
+                'id': update.callback_query.message.chat.id,
+                'type': update.callback_query.message.chat.type
+            },
+            'user': {
+                'id': update.callback_query.user.id,
+                'username': username,
+                'lang': update.callback_query.user.language_code
+            },
+            'service': self.__name__,
+            'data': update.callback_query.data
+        })
 
     def run(self, broker):
         """
@@ -117,7 +143,11 @@ class Telegram:
             parse_mode = message_payload.get('parse_mode', None)
 
             if 'markup' in message_payload:
-                self.message.set_reply_markup(*message_payload['markup'])
+                markup = message_payload['markup']
+                self.message.set_reply_markup(markup.get('keyboard', None),
+                                              markup.get('inline_keyboard', None),
+                                              markup.get('remove_keyboard', None),
+                                              markup.get('force_reply', None))
 
             self.message.send(chat_id, message, parse_mode)
             return
@@ -127,7 +157,5 @@ class Telegram:
             caption = None
             if 'caption' in message_payload:
                 caption = message_payload['caption']
-            if 'markup' in message_payload:
-                self.photo.set_reply_markup(*message_payload['markup'])
             self.photo.send(chat_id, photo, caption)
             return
