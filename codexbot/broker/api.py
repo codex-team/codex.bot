@@ -23,11 +23,7 @@ class API:
             'send to service': self.send_to_service,
             'wait user answer': self.wait_user_answer
         }
-        # List of registered commands
-        self.commands = {
-            # Key is command name, value is tuple(description, application name)
-            '/help': ('Show help', 'core')
-        }
+
         # Generate list of applications (self.apps)
         self.apps = {}
         self.load_apps()

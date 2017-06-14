@@ -16,12 +16,17 @@ class Broker:
     WRONG = 400
     ERROR = 500
 
+    system_commands = {}
+
     def __init__(self, core, event_loop):
         logging.info("Broker started ;)")
         self.core = core
         self.event_loop = event_loop
         self.api = API(self)
         self.app_manager = AppManager(self)
+        self.system_commands = {
+            'help': self.help_command
+        }
 
     async def callback(self, channel, body, envelope, properties):
         """
@@ -46,7 +51,6 @@ class Broker:
         :param message_data: 
         :return: 
         """
-
         chat_hash = self.get_chat_hash(message_data)
         user_hash = self.get_user_hash(message_data)
 
@@ -72,6 +76,11 @@ class Broker:
             if incoming_cmd['command'] in self.app_manager.commands:
                 self.app_manager.process(chat_hash, incoming_cmd)
                 continue
+
+            # Handle core-predefined command
+            if self.check_for_system_command(incoming_cmd['command']):
+                self.system_commands[incoming_cmd['command']](incoming_cmd)
+                return True
 
             app_cmd = self.core.db.find_one(self.api.COMMANDS_COLLECTION_NAME, {
                 'name': incoming_cmd['command']
@@ -184,3 +193,17 @@ class Broker:
             user_hash = user['hash']
 
         return user_hash
+
+    def check_for_system_command(self, command):
+        """
+        Check if passed command is predefined by core
+        :param command:
+        :return:
+        """
+        if command in self.system_commands:
+            return True
+        return False
+
+    def help_command(self, command):
+        print('Got system command')
+        print(command)
