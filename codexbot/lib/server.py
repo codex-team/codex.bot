@@ -5,12 +5,29 @@ def http_response(function):
     async def wrapper(self, request):
         text = await request.text()
         post = await request.post()
+        headers = request.headers
+        params = request.match_info
+        query = request.query
         try:
             json = await request.json()
         except Exception as e:
             json = {}
-        result = await function(self, text, post, json)
-        return aiohttp.web.Response(text="OK")
+        result = await function(self, {
+            'text': text,
+            'post': post,
+            'json': json,
+            'params': params,
+            'headers': headers,
+            'query': query
+        })
+
+        response_text = result.get('text', '')
+        response_status = result.get('status', 200)
+
+        if response_status != 404:
+            return aiohttp.web.Response(text=response_text)
+        else:
+            return aiohttp.web.HTTPNotFound(text=response_text)
     return wrapper
 
 
