@@ -14,11 +14,18 @@ class SystemCommand:
 
     async def help(self, chat, cmd_payload):
 
-        text = "Codex.Bot — платформа для интеграции различных сервисов в мессенджеры.\n\n" \
-               "Для просмотра подключенных приложений используйте команду /apps\n\n" \
-               "Для регистрации нового приложения введите /newapp\n" \
-               "Для просмотра ваших приложений введите /myapps \n\n" \
-               "Больши информации на bot.ifmo.su\n" \
+        # text = "Codex.Bot — платформа для интеграции различных сервисов в мессенджеры.\n\n" \
+        #        "Для просмотра подключенных приложений используйте команду /apps\n\n" \
+        #        "Для регистрации нового приложения введите /newapp\n" \
+        #        "Для просмотра ваших приложений введите /myapps \n\n" \
+        #        "Больши информации на bot.ifmo.su\n" \
+        #        "Codex Team"
+
+        text = "Codex Bot is a platform for services integration into messengers\n\n" \
+               "To see available applications use /apps\n\n" \
+               "To register new application use /newapp\n" \
+               "To see your applications use /myapps\n\n" \
+               "More information on bot.ifmo.su\n" \
                "Codex Team"
 
         message_payload = {
@@ -30,7 +37,8 @@ class SystemCommand:
 
     async def apps(self, chat, cmd_payload):
 
-        text = "Доступные приложения\n\n"
+        # text = "Доступные приложения\n\n"
+        text = "Available applications:\n\n"
 
         avaliable_apps = []
 
@@ -46,7 +54,8 @@ class SystemCommand:
             avaliable_apps.append(command)
 
         if not len(avaliable_apps):
-            text = 'Доступных приложений нет'
+            # text = 'Доступных приложений нет'
+            text = "There are no available applications"
 
         message_payload = {
             'chat_hash': chat,
