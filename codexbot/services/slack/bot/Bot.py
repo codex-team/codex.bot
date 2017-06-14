@@ -8,7 +8,7 @@ authed_teams = {}
 
 class Bot():
 
-    def __init__(self):
+    def __init__(self, token):
 
         self.name = BOT_NAME
         self.oauth = {
@@ -18,11 +18,9 @@ class Bot():
         }
 
         self.verification = VERIFICATION
-
-        token = "xoxp-12842278998-178131484659-192403579346-d5b1f2bd03ac7bbfa3f6ecdc53d66e94"
         self.client = SlackClient(token)
 
-    def auth(self, code):
+    def auth(self, code, broker):
 
         if not code:
             return {
@@ -54,8 +52,16 @@ class Bot():
                 "bot_token" : auth_response["bot"]["bot_access_token"]
             }
 
-            self.__token = authed_teams[team_id]["bot_token"]
-            self.client = SlackClient(self.__token)
+            token = authed_teams[team_id]["bot_token"]
+
+            broker.core.db.update('slack', {
+                'team_id': team_id
+            }, {
+                'team_id': team_id,
+                'token': token
+            }, upsert=True)
+
+            self.client = SlackClient(token)
 
         test_auth = False
         test_api = False

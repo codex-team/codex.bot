@@ -1,9 +1,7 @@
 import logging
-from json import loads
 
 from codexbot.lib.server import http_response
-from codexbot.services.slack.bot.Bot import Bot
-from codexbot.services.slack.methods.handler import Handler
+from codexbot.services.slack.bot.Bot import Bot, authed_teams
 
 
 class Slack:
@@ -14,10 +12,9 @@ class Slack:
 
         self.routes = [
             ('GET', '/slack/oauth', self.slack_oauth),
-            ('POST', '/callbacks/slack', self.slack_callback),
+            ('POST', '/slack/events', self.slack_events),
+            ('POST', '/slack/commands', self.slack_commands)
         ]
-
-        self.slackBot = Bot()
 
         logging.debug("Slack module initiated.")
 
@@ -29,53 +26,104 @@ class Slack:
         self.broker = broker
 
     @http_response
-    async def slack_callback(self, params):
+    async def slack_commands(self, params):
+
+        # get necessary params from request
+        team_id = params['post']['team_id']
+        channel_id = params['post']['channel_id']
+        command = params['post']['command']
+        text = params['post']['command']
+        user_id = params['post']['user_id']
+        user_name = params['post']['user_name']
+
+        # getting command name without slash
+        commands = {
+            'command': command[1:],
+            'payload': text
+        }
+
+        # Pass commands from message data to broker
+        await self.broker.commands_to_app({
+            'chat': {
+                'id': team_id + '.' + channel_id,
+                'type': 'private' if params['post']['channel_name'] == 'directmessage' else 'group'  # --- private or channel
+            },
+            'user': {
+                'id': user_id,
+                'username': user_name,
+                'lang': None
+            },
+            'service': self.__name__,
+            'commands': [commands],
+            'text': text
+        })
+
+        # return empty response
+        return {
+            'text' : '',
+            'status': 200
+        }
+
+    @http_response
+    async def slack_oauth(self, params):
+
+        query = params['query']
+
+        slackBot = Bot("")
+
+        if 'code' in query:
+            oauth = slackBot.auth(query['code'], self.broker)
+        else:
+            return {
+                'text': 'Ошибка',
+                'status': 404
+            }
+
+        return oauth
+
+    @http_response
+    async def slack_events(self, params):
         """
         This route listens for incoming events from Slack and uses the event
         handler helper function to route events to our Bot.
         """
         income_params = params['json']
 
+        # confirm event subscription
         if 'challenge' in income_params:
-            return income_params['challenge']
-        else:
-            Handler(income_params)
             return {
-                'text' : 'OK',
+                'text' : income_params['challenge'],
+                'status' : 200
+            }
+        else:
+
+            return {
+                'text' : '',
                 'status' : 200
             }
 
-    @http_response
-    async def slack_oauth(self, params):
+    def send(self, chat_id, message_payload):
 
-        query = params['query']
-        if 'code' in query:
-            oauth = self.slackBot.auth(query['code'])
-        else:
-            result = {
-                'text' : 'Ошибка',
-                'status' : 404
-            }
+        team_id, channel_id = chat_id.split('.')
 
-        print(oauth)
-        pass
-        # Pass commands from message data to broker
-        await self.broker.service_to_app({
-            'chat': {
-                'id': oauth["team_id"],
-                'type': ''
-            },
-            'user': {
-                'id': update.message.user.id,
-                'username': username,
-                'lang': update.message.user.language_code
-            },
-            'service': self.__name__,
-            'commands': update.get_commands(),
-            'text': update.message.text
+        query = self.broker.core.db.find_one('slack', {
+            'team_id': team_id
         })
 
-        return result
+        if team_id in authed_teams and "bot_token" in authed_teams[team_id]:
+            token = authed_teams[team_id]["bot_token"]
+        else:
+            token = query['token']
+
+        # initialize slack client
+        slackBot = Bot(token)
+
+        # send post message request to channel
+        slackBot.client.api_call(
+            "chat.postMessage",
+            channel=channel_id,
+            text=message_payload['text'],
+        )
 
 
 

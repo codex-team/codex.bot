@@ -38,22 +38,25 @@ class Telegram:
         logging.debug("Telegram service initiated.")
 
     @http_response
-    async def telegram_callback(self, text, post, json):
+    async def telegram_callback(self, params):
         """
         Process messages from telegram bot
         :return:
         """
-        logging.info("Got telegram callback {} {} {}".format(text, post, json))
+        logging.info("Got telegram callback {}".format(params['json']))
 
         # Parse telegram message
-        update = Update(json)
+        update = Update(params['json'])
 
         if update.message:
             await self.send_message_to_app(update)
         elif update.callback_query:
             await self.send_callback_query_to_app(update)
 
-        return True
+        return {
+            'text' : 'ok',
+            'status' : 200
+        }
 
     async def send_message_to_app(self, update):
         if update.message.user.username:
