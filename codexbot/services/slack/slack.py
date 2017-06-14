@@ -42,11 +42,14 @@ class Slack:
             'payload': text
         }
 
+        # send event type to core handler
+        type = 'private' if params['post']['channel_name'] == 'directmessage' else 'group'
+
         # Pass commands from message data to broker
         await self.broker.commands_to_app({
             'chat': {
                 'id': team_id + '.' + channel_id,
-                'type': 'private' if params['post']['channel_name'] == 'directmessage' else 'group'  # --- private or channel
+                'type': type # --- private or channel
             },
             'user': {
                 'id': user_id,

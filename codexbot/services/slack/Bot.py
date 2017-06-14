@@ -71,12 +71,15 @@ class Bot():
             token = authed_teams[team_id]["bot_token"]
 
             # insert or update team_id and token to further bot usage
-            broker.core.db.update(self.collection_name, {
-                'team_id': team_id
-            }, {
-                'team_id': team_id,
-                'token': token
-            }, upsert=True)
+            broker.core.db.update(self.collection_name,
+                                  {
+                                    'team_id': team_id
+                                  },
+                                  {
+                                    'team_id': team_id,
+                                    'token': token
+                                  },
+                                  upsert=True)
 
             self.client = SlackClient(token)
 
