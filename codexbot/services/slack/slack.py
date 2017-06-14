@@ -32,7 +32,7 @@ class Slack:
         team_id = params['post']['team_id']
         channel_id = params['post']['channel_id']
         command = params['post']['command']
-        text = params['post']['command']
+        text = params['post']['text']
         user_id = params['post']['user_id']
         user_name = params['post']['user_name']
 
