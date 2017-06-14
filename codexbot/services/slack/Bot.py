@@ -8,8 +8,13 @@ authed_teams = {}
 
 class Bot():
 
-    def __init__(self, token):
+    def __init__(self, token=None):
 
+        """
+        connect slack client with slack bot 
+        
+        :param token: 
+        """
         self.name = BOT_NAME
         self.oauth = {
             "client_id": CLIENT_ID,
@@ -17,14 +22,25 @@ class Bot():
             "scope": "bot"
         }
 
+        self.collection_name = 'slack'
         self.verification = VERIFICATION
         self.client = SlackClient(token)
 
     def auth(self, code, broker):
 
+        """
+        Authentificate bot: 
+            1. send oauth.access api method with params below
+            2. getting team and token
+            3. Save team_id as key and token as value
+        
+        :param code:  this code will be send by Slack App. 
+        :param broker: core method that allows us to do database queries
+        :return: 
+        """
         if not code:
             return {
-                'text' : 'Нет ключа для авторизации',
+                'text' : 'Code expected',
                 'status': 404
             }
 
@@ -38,12 +54,12 @@ class Bot():
         if not auth_response.get('ok'):
             if auth_response.get('error') == 'code_already_used':
                 return {
-                    'text' : 'Приложение было добавлено ранее с ошибками. Пожалуйста, переустановите приложение еще раз',
+                    'text' : 'The application was connected with errors. Please, try to reinstall application',
                     'status' : 200
                 }
             else:
                 return {
-                    'text' : 'Произошла ошибка при авторизации приложения',
+                    'text' : 'Error occured in authentification proccess',
                     'status' : 200
                 }
         else:
@@ -54,7 +70,8 @@ class Bot():
 
             token = authed_teams[team_id]["bot_token"]
 
-            broker.core.db.update('slack', {
+            # insert or update team_id and token to further bot usage
+            broker.core.db.update(self.collection_name, {
                 'team_id': team_id
             }, {
                 'team_id': team_id,
@@ -81,6 +98,11 @@ class Bot():
         if test_auth and test_api:
             return {
                 'result' : auth_response,
-                'text' : 'Регистрация прошла успешно',
+                'text' : 'Application was authorized successfully!',
+                'status': 200
+            }
+        else:
+            return {
+                'text' : 'Error. Token is not correct or you are not allowed to use API',
                 'status': 200
             }

@@ -1,7 +1,7 @@
 import logging
 
 from codexbot.lib.server import http_response
-from codexbot.services.slack.bot.Bot import Bot, authed_teams
+from codexbot.services.slack.Bot import Bot, authed_teams
 
 
 class Slack:
@@ -66,10 +66,19 @@ class Slack:
 
     @http_response
     async def slack_oauth(self, params):
-
+        """
+        After hand-filling command in api.slack.com/apps, we got verification request wth 'challenge' and 'token'. 
+        To verify, pass back 'challenge' field.
+        
+        Api URL : https://api.slack.com/events/url_verification
+        
+        :param params: responds http_response decorator.  
+        :return: 
+        """
         query = params['query']
 
-        slackBot = Bot("")
+        # set bot instance
+        slackBot = Bot()
 
         if 'code' in query:
             oauth = slackBot.auth(query['code'], self.broker)
@@ -103,7 +112,13 @@ class Slack:
             }
 
     def send(self, chat_id, message_payload):
-
+        """
+        Used by Codex bot core to send message to the required platform
+        
+        :param chat_id: 
+        :param message_payload: 
+        :return: 
+        """
         team_id, channel_id = chat_id.split('.')
 
         query = self.broker.core.db.find_one('slack', {

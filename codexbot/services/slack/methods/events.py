@@ -1,16 +1,28 @@
+from codexbot.services.slack.Bot import Bot
 from .message import Message
-from codexbot.services.slack.bot.Bot import Bot
 
 
-class Handler():
+class Events():
+
     def __init__(self, slack_event):
+        """
+        Handle all subsripted events
+        @todo: Most functions are useless. Make structure more flexible
+        
+        :param slack_event: event params
+        """
         self.slack_event  = slack_event
         self.slackBot = Bot()
-
         self.handle(self.slack_event)
 
     def handle(self, slack_event):
 
+        """
+        get event type and use structured classes to handle events
+        
+        :param slack_event: 
+        :return: 
+        """
         event = slack_event.get('event')
 
         if event.get('type') == 'message':
@@ -39,7 +51,13 @@ class Handler():
             print('reaction_added')
 
     def get_bot_id(self, bot_name):
-        members = self.slack_client.api_call("users.list")
+        """
+        get bot ID by bot name 
+                
+        :param bot_name: 
+        :return: 
+        """
+        members = self.slackBot.client.api_call("users.list")
         if members.get('ok'):
             users = members.get('members')
             for user in users:
@@ -49,13 +67,26 @@ class Handler():
                 print("could not find bot user with the name " + bot_name)
 
     def channels_list(self):
-        channels_list = self.slack_client.api_call("channels.list")
+        """
+        get teams channel list
+        
+        :return: 
+        """
+        channels_list = self.slackBot.client.api_call("channels.list")
         if channels_list.get('ok'):
             return channels_list['channels']
         return None
 
     def send_message(self, channel_id, message, emoji):
-        self.slack_client.api_call(
+        """
+        send message to the channel
+         
+        :param channel_id:
+        :param message: 
+        :param emoji: 
+        :return: 
+        """
+        self.slackBot.client.api_call(
             "chat.postMessage",
             channel=channel_id,
             text=message,
@@ -64,7 +95,13 @@ class Handler():
         )
 
     def channels_info(self, channel_id):
-        channel_info = self.slack_client.api_call("channels.info", channel=channel_id)
+        """
+        get full information about channel
+        
+        :param channel_id: 
+        :return: 
+        """
+        channel_info = self.slackBot.client.api_call("channels.info", channel=channel_id)
         if channel_info:
             return channel_info
         return None
