@@ -24,12 +24,22 @@ class API:
             'wait user answer': self.wait_user_answer
         }
 
+        self.commands = {}
+
         # Generate list of applications (self.apps)
         self.apps = {}
         self.load_apps()
 
         self.pending_apps = {}
         self.load_pending_apps()
+
+        self.load_commands()
+
+    def load_commands(self):
+        commands = self.db.find(API.COMMANDS_COLLECTION_NAME, {})
+        for command in commands:
+            self.commands[command['name']] = (command['description'], command['app_token'])
+
 
     def load_apps(self):
         """
@@ -156,8 +166,7 @@ class API:
                 if not name in self.commands.keys() and \
                    not self.db.find_one(API.COMMANDS_COLLECTION_NAME, {
                        'name': name
-                   }
-                ):
+                   }):
                     self.commands[name] = (description, app_token)
                     self.db.insert(API.COMMANDS_COLLECTION_NAME, {
                         'name': name,

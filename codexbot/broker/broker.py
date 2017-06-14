@@ -1,13 +1,13 @@
-import asyncio
 import json
 import logging
 import random
 import string
 
-from codexbot.lib.rabbitmq import add_message_to_queue, init_receiver
-from .api import API
-from .appmanager import AppManager
 from codexbot.globalcfg import RABBITMQ
+from codexbot.lib.rabbitmq import add_message_to_queue, init_receiver
+from codexbot.systemapps.appmanager import AppManager
+from codexbot.systemapps.systemcommands import SystemCommand
+from .api import API
 
 
 class Broker:
@@ -24,9 +24,8 @@ class Broker:
         self.event_loop = event_loop
         self.api = API(self)
         self.app_manager = AppManager(self)
-        self.system_commands = {
-            'help': self.help_command
-        }
+        self.system_commands = SystemCommand(self.api)
+
 
     async def callback(self, channel, body, envelope, properties):
         """
@@ -78,20 +77,16 @@ class Broker:
                 continue
 
             # Handle core-predefined command
-            if self.check_for_system_command(incoming_cmd['command']):
-                self.system_commands[incoming_cmd['command']](incoming_cmd)
+            if incoming_cmd['command'] in self.system_commands.commands:
+                await self.system_commands.commands[incoming_cmd['command']](chat_hash, incoming_cmd['payload'])
                 return True
 
-            app_cmd = self.core.db.find_one(self.api.COMMANDS_COLLECTION_NAME, {
-                'name': incoming_cmd['command']
-            })
+            command_data = self.api.commands.get(incoming_cmd['command'])
 
-            if not app_cmd:
+            if not command_data:
                 continue
 
-            app = self.core.db.find_one(self.api.APPS_COLLECTION_NAME, {
-                'name': app_cmd['app_name']
-            })
+            app = self.api.apps[command_data[1]]
 
             message = json.dumps({
                 'command': 'service callback',
@@ -193,17 +188,3 @@ class Broker:
             user_hash = user['hash']
 
         return user_hash
-
-    def check_for_system_command(self, command):
-        """
-        Check if passed command is predefined by core
-        :param command:
-        :return:
-        """
-        if command in self.system_commands:
-            return True
-        return False
-
-    def help_command(self, command):
-        print('Got system command')
-        print(command)
