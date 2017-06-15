@@ -1,4 +1,5 @@
 import logging
+import json
 
 from codexbot.lib.server import http_response
 from codexbot.services.slack.Bot import Bot, authed_teams
@@ -136,12 +137,39 @@ class Slack:
         # initialize slack client
         slackBot = Bot(token)
 
-        # send post message request to channel
-        slackBot.client.api_call(
-            "chat.postMessage",
-            channel=channel_id,
-            text=message_payload['text'],
-        )
+        template = 'codexbot/services/slack/templates/'
+
+        if 'text' in message_payload:
+            template = template + 'text.json'
+
+            # send post message request to channel
+            slackBot.client.api_call(
+                "chat.postMessage",
+                channel=channel_id,
+                text=message_payload['text'],
+            )
+
+        if 'photo' in message_payload:
+            template = template + 'image.json'
+
+            with open(template) as data_file:
+                data = json.load(data_file)
+
+            # fill in empty template
+            data[0]['title'] = 'New Image'
+            data[0]['image_url'] = message_payload['photo']
+
+            # send post message request to channel
+            slackBot.client.api_call(
+                "chat.postMessage",
+                channel=channel_id,
+                text=message_payload['text'],
+                attachments=json.dumps(data)
+            )
+
+
+
+
 
 
 
