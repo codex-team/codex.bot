@@ -40,20 +40,19 @@ class SystemCommand:
         # text = "Доступные приложения\n\n"
         text = "Available applications:\n\n"
 
-        avaliable_apps = []
+        available_apps = []
 
         for app in self.api.apps:
 
             command = self.api.apps[app]['name']
-            print(self.api.commands)
             description, app_token = self.api.commands.get(command, (None, None))
             if not description:
                 continue
 
             text += "/{} — {}\n".format(command, description)
-            avaliable_apps.append(command)
+            available_apps.append(command)
 
-        if not len(avaliable_apps):
+        if not len(available_apps):
             # text = 'Доступных приложений нет'
             text = "There are no available applications"
 

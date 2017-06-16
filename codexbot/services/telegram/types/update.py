@@ -1,6 +1,7 @@
 from json import loads
 from .message import Message
 from .callbackquery import CallbackQuery
+from ..config import BOT_NAME
 
 
 class Update:
@@ -55,8 +56,13 @@ class Update:
             else:
                 payload_end = None
 
+            command = self.message.text[command_start : command_end]
+
+            if BOT_NAME in command:
+                command, botname = command.split('@', 1)
+
             commands.append({
-                'command': self.message.text[command_start : command_end],
+                'command': command,
                 'payload': self.message.text[payload_start : payload_end]
             })
 
