@@ -78,6 +78,9 @@ class Slack:
             payload = callback['payload']
             payload = json.loads(payload)
 
+            # I don't know how, but I get such response from metrika module
+            # Response looks:
+            # { "actions": [{"name": "$name", "value":"$value", "type":"button"}], "channel":{"name":"$channelname", "id":"$hash"}}
             data = payload['actions'][0]['value']
             channel_id = payload['channel']['id']
             team_id = payload['team']['id']
@@ -216,8 +219,10 @@ class Slack:
             for row in message_payload['markup']['inline_keyboard']:
                 for button in row:
                     if 'url' in button:
+                        # add link if button has link
                         url = button['url']
                     else:
+                        # add buttons to message attachments
                         actions.append({
                             'name': 'button',
                             'text': button['text'],
@@ -228,7 +233,7 @@ class Slack:
             if url is None:
                 data[0]['actions'] = actions
 
-                # send post message request to channel
+                # send post message request to channel with link
                 slackBot.client.api_call(
                     "chat.postMessage",
                     channel=channel_id,
@@ -238,7 +243,7 @@ class Slack:
                 data[0]['title'] = url
                 data[0]['title_link'] = url
 
-                # send post message request to channel
+                # send post message request to channel with buttons
                 slackBot.client.api_call(
                     "chat.postMessage",
                     channel=channel_id,
