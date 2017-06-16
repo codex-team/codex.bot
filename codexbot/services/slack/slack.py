@@ -14,7 +14,8 @@ class Slack:
         self.routes = [
             ('GET', '/slack/oauth', self.slack_oauth),
             ('POST', '/slack/events', self.slack_events),
-            ('POST', '/slack/commands', self.slack_commands)
+            ('POST', '/slack/commands', self.slack_commands),
+            ('POST', '/slack/buttons', self.slack_buttons),
         ]
 
         logging.debug("Slack module initiated.")
@@ -65,6 +66,45 @@ class Slack:
         # return empty response
         return {
             'text' : '',
+            'status': 200
+        }
+
+    @http_response
+    async def slack_buttons(self, params):
+
+        callback = params['post']
+
+        if 'payload' in callback:
+            payload = callback['payload']
+            payload = json.loads(payload)
+
+            print(payload)
+
+            data = payload['actions'][0]['value']
+            channel_id = payload['channel']['id']
+            team_id = payload['team']['id']
+            user_id = payload['user']['id']
+            user_name = payload['user']['name']
+
+            # send event type to core handler
+            type = 'private' if payload['channel']['name'] == 'directmessage' else 'group'
+
+            await self.broker.callback_query_to_app({
+                'chat': {
+                    'id': team_id + '.' + channel_id,
+                    'type': type
+                },
+                'user': {
+                    'id': user_id,
+                    'username': user_name,
+                    'lang': None
+                },
+                'service': self.__name__,
+                'data': data
+            })
+
+        return {
+            'text': '',
             'status': 200
         }
 
@@ -137,10 +177,8 @@ class Slack:
         # initialize slack client
         slackBot = Bot(token)
 
-        template = 'codexbot/services/slack/templates/'
-
         if 'text' in message_payload:
-            template = template + 'text.json'
+            template = 'codexbot/services/slack/templates/text.json'
 
             # send post message request to channel
             slackBot.client.api_call(
@@ -150,26 +188,64 @@ class Slack:
             )
 
         if 'photo' in message_payload:
-            template = template + 'image.json'
+            template = 'codexbot/services/slack/templates/image.json'
 
             with open(template) as data_file:
                 data = json.load(data_file)
 
             # fill in empty template
-            data[0]['title'] = 'New Image'
+            data[0]['title'] = 'CodeX'
+            data[0]['text'] = message_payload['caption']
             data[0]['image_url'] = message_payload['photo']
 
             # send post message request to channel
             slackBot.client.api_call(
                 "chat.postMessage",
                 channel=channel_id,
-                text=message_payload['text'],
                 attachments=json.dumps(data)
             )
 
+        if 'markup' in message_payload:
+            template = 'codexbot/services/slack/templates/buttons.json'
 
+            with open(template) as data_file:
+                data = json.load(data_file)
 
+            actions = []
+            url = None
 
+            # fill in template
+            for row in message_payload['markup']['inline_keyboard']:
+                for button in row:
+                    if 'url' in button:
+                        url = button['url']
+                    else:
+                        actions.append({
+                            'name': 'button',
+                            'text': button['text'],
+                            'value': button['callback_data'],
+                            'type': 'button'
+                        })
+
+            if url is None:
+                data[0]['actions'] = actions
+
+                # send post message request to channel
+                slackBot.client.api_call(
+                    "chat.postMessage",
+                    channel=channel_id,
+                    attachments=json.dumps(data)
+                )
+            else:
+                data[0]['title'] = url
+                data[0]['title_link'] = url
+
+                # send post message request to channel
+                slackBot.client.api_call(
+                    "chat.postMessage",
+                    channel=channel_id,
+                    attachments=json.dumps(data)
+                )
 
 
 

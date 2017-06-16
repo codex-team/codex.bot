@@ -1,0 +1,11 @@
+[
+    {
+        "fallback": "Required plain-text summary of the attachment.",
+        "color": "#36a64f",
+        "title": "CodeX - Metrika :smile:",
+        "title_link": "https://api.slack.com/",
+        "callback_id": "metrika",
+        "response_url": "https://0ab6944e.ngrok.io/slack/commands",
+        "text": "Инструкция по работе с Метрикой"
+    }
+]
