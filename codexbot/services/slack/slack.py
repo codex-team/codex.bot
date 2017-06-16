@@ -78,8 +78,6 @@ class Slack:
             payload = callback['payload']
             payload = json.loads(payload)
 
-            print(payload)
-
             data = payload['actions'][0]['value']
             channel_id = payload['channel']['id']
             team_id = payload['team']['id']
