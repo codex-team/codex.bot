@@ -186,6 +186,7 @@ class Slack:
                 "chat.postMessage",
                 channel=channel_id,
                 text=message_payload['text'],
+                mrkdwn=True
             )
 
         if 'photo' in message_payload:
@@ -203,7 +204,8 @@ class Slack:
             slackBot.client.api_call(
                 "chat.postMessage",
                 channel=channel_id,
-                attachments=json.dumps(data)
+                attachments=json.dumps(data),
+                mrkdwn=True
             )
 
         if 'markup' in message_payload:
@@ -237,7 +239,8 @@ class Slack:
                 slackBot.client.api_call(
                     "chat.postMessage",
                     channel=channel_id,
-                    attachments=json.dumps(data)
+                    attachments=json.dumps(data),
+                    mrkdwn=True
                 )
             else:
                 data[0]['title'] = url
@@ -247,7 +250,8 @@ class Slack:
                 slackBot.client.api_call(
                     "chat.postMessage",
                     channel=channel_id,
-                    attachments=json.dumps(data)
+                    attachments=json.dumps(data),
+                    mrkdwn=True
                 )
 
 

@@ -1,5 +1,6 @@
 [
     {
-        "fallback": "Required plain-text summary of the attachment."
+        "fallback": "Required plain-text summary of the attachment.",
+        "mrkdwn_in" : ["text"]
     }
 ]

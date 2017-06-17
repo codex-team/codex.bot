@@ -4,6 +4,7 @@
     "color":  "#36a64f",
     "title" : "",
     "text" : "",
-    "image_url": ""
+    "image_url": "",
+    "mrkdwn_in" : ["text"]
   }
 ]
