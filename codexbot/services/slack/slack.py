@@ -3,6 +3,7 @@ import json
 
 from codexbot.lib.server import http_response
 from codexbot.services.slack.Bot import Bot, authed_teams
+from .methods.slackify import Slackify
 
 
 class Slack:
@@ -180,12 +181,15 @@ class Slack:
 
         if 'text' in message_payload:
             template = 'codexbot/services/slack/templates/text.json'
+            parser = Slackify(message_payload['text'])
+            formatted_text = parser.get_output()
 
             # send post message request to channel
             slackBot.client.api_call(
                 "chat.postMessage",
                 channel=channel_id,
-                text=message_payload['text'],
+                text=formatted_text,
+                mrkdwn=True
             )
 
         if 'photo' in message_payload:
@@ -203,7 +207,8 @@ class Slack:
             slackBot.client.api_call(
                 "chat.postMessage",
                 channel=channel_id,
-                attachments=json.dumps(data)
+                attachments=json.dumps(data),
+                mrkdwn=True
             )
 
         if 'markup' in message_payload:
@@ -237,7 +242,8 @@ class Slack:
                 slackBot.client.api_call(
                     "chat.postMessage",
                     channel=channel_id,
-                    attachments=json.dumps(data)
+                    attachments=json.dumps(data),
+                    mrkdwn=True
                 )
             else:
                 data[0]['title'] = url
@@ -247,9 +253,7 @@ class Slack:
                 slackBot.client.api_call(
                     "chat.postMessage",
                     channel=channel_id,
-                    attachments=json.dumps(data)
+                    attachments=json.dumps(data),
+                    mrkdwn=True
                 )
-
-
-
 
