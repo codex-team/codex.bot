@@ -29,6 +29,8 @@ class Slackify(HTMLParser):
             self.output += ' *'
         if tag == 'i' or tag == 'em':
             self.output += ' _'
+        if tag == 'code':
+            self.output += ' `'
         if tag == 'a':
             self.output += ' <'
             for attr in attrs:
@@ -46,6 +48,8 @@ class Slackify(HTMLParser):
             self.output += '_ '
         if tag == 'a':
             self.output += '> '
+        if tag == 'code':
+            self.output += '` '
 
     def handle_data(self, data):
         """

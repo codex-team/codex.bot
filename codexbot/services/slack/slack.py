@@ -199,8 +199,12 @@ class Slack:
                 data = json.load(data_file)
 
             # fill in empty template
-            data[0]['title'] = 'CodeX'
-            data[0]['text'] = message_payload['caption']
+            data[0]['title'] = 'Slack Integration'
+
+            parser = Slackify(message_payload['caption'])
+            formatted_text = parser.get_output()
+
+            data[0]['text'] = formatted_text
             data[0]['image_url'] = message_payload['photo']
 
             # send post message request to channel
