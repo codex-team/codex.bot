@@ -1,3 +1,5 @@
+import re
+
 from html.parser import HTMLParser
 from html.entities import name2codepoint
 
@@ -35,6 +37,8 @@ class Slackify(HTMLParser):
             self.output += ' <'
             for attr in attrs:
                 self.output += attr[1] + '|'
+        if tag == 'br':
+            self.output += '\n'
 
     def handle_endtag(self, tag):
         """
@@ -63,14 +67,14 @@ class Slackify(HTMLParser):
         pass
 
     def handle_entityref(self, name):
-        c = chr(name2codepoint[name])
+        self.output += chr(name2codepoint[name])
         pass
 
     def handle_charref(self, name):
         if name.startswith('x'):
-            c = chr(int(name[1:], 16))
+            self.output += chr(int(name[1:], 16))
         else:
-            c = chr(int(name))
+            self.output += chr(int(name))
 
     def handle_decl(self, data):
         pass
@@ -82,4 +86,8 @@ class Slackify(HTMLParser):
         link: https://stackoverflow.com/questions/2077897/substitute-multiple-whitespace-with-single-whitespace-in-python
         :return: 
         """
-        return ' '.join(self.output.split())
+
+        # remove two or more spaces
+        # https://stackoverflow.com/questions/1546226/a-simple-way-to-remove-multiple-spaces-in-a-string-in-python
+        formatted_string = re.sub(' +', ' ', self.output)
+        return str(formatted_string)
