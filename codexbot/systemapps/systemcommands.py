@@ -26,7 +26,7 @@ class SystemCommand:
                "To register new application use /newapp\n" \
                "To see your applications use /myapps\n\n" \
                "More information on ifmo.su/bot\n" \
-               "Codex Team"
+               "CodeX Team"
 
         message_payload = {
             'chat_hash': chat,
