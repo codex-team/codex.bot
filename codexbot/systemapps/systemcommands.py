@@ -25,7 +25,7 @@ class SystemCommand:
                "To see available applications use /apps\n\n" \
                "To register new application use /newapp\n" \
                "To see your applications use /myapps\n\n" \
-               "More information on bot.ifmo.su\n" \
+               "More information on ifmo.su/bot\n" \
                "Codex Team"
 
         message_payload = {
