@@ -1,5 +1,5 @@
 # @codex_bot
-Platform for integration of services into messengers. It simple. Applications written with our SDK will be available in all supported messengers.
+Platform for integration of services into messengers. It's simple. Applications written with [our SDK](https://github.com/codex-bot/sdk-python) will be available in all supported messengers.
 
 # Messengers
 Currently we support these messengers. We will add several ones soon.
@@ -58,14 +58,14 @@ Easy-to-setup notifications scheme. You will get special link that allows to sen
 - `/notify_start` — get webhook URL for sending request
 - Send POST request for given URL with `message` field
 
-Example: 
+Example:
 ```bash
 curl -X POST https://notify.bot.ifmo.su/u/ABCD1234 -d "message=Hello world"
 ```
 
 ![demo](https://user-images.githubusercontent.com/15448200/29435981-1c1e223e-83b2-11e7-8ee0-a3568b40ed7b.gif "You'll get message Hello world in telegram chat")
 
-## RSS Parser 
+## RSS Parser
 https://github.com/codex-bot/rssparser
 
 Subscribe to your favorite feeds and get notifications with updates.
