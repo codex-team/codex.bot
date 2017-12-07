@@ -21,7 +21,7 @@ Everyone can write own application with our SDK. Thats we've got now.
 ### GitHub
 https://github.com/codex-bot/github
 
-Helpful integration with github.com. Provides notifications about
+Useful integration with github.com. Provides notifications about
 - Opened/closed issues
 - Assigned issues
 - Opened/closes pull requests
