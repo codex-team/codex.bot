@@ -13,7 +13,7 @@ Add `@codex_bot` in your chat and type `/apps` to view list of available applica
 
 ### How to create own application
 
-Our [Python SDK](https://github.com/codex-bot/sdk-python) and Guide for creation an app will help you.
+Our [Python SDK](https://github.com/codex-bot/sdk-python) and [Guide for creation an app](https://github.com/codex-team/codex.bot/wiki/Developer's-Guide) will help you.
 
 ## Available applications
 Everyone can write own application with our SDK. Thats we've got now.
@@ -93,9 +93,8 @@ Allow you to be informed about weather conditions in your region via Telegram ch
 
 ## Issues and improvements
 
-Ask a question or report a bug on the [create issue page](https://github.com/codex-team/codex.bot/issues/new).
-
-Know how to improve platform? [Fork it](https://github.com/codex-team/codex.bot) and send a pull request.
+- Ask a question or report a bug on the [create issue page](https://github.com/codex-team/codex.bot/issues/new).
+- Know how to improve platform? [Fork it](https://github.com/codex-team/codex.bot) and send a pull request.
 
 ## About CodeX
 
