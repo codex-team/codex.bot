@@ -27,12 +27,13 @@ class Message(Base):
             raise Exception('Message text is required')
 
         payload = {
-            'text': text,
-            'disable_web_page_preview': disable_web_page_preview
+            'text': text
         }
 
         if parse_mode:
             payload['parse_mode'] = parse_mode
+        if disable_web_page_preview:
+            payload['disable_web_page_preview'] = disable_web_page_preview
 
         return {
             'payload': payload,
