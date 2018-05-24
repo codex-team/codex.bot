@@ -128,6 +128,7 @@ class Telegram:
             - chat_hash  - chat hash
             - text       - message text
             - parse_mode - message parse mode type
+            - disable_web_page_preview - if it is needed to disable link preview
             - photo      - photo to send (you shouldn't pass text param if you want to send photo)
             - caption    - caption for photo
             For markups see https://core.telegram.org/bots/api#replykeyboardmarkup
