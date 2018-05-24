@@ -128,6 +128,7 @@ class Telegram:
             - chat_hash  - chat hash
             - text       - message text
             - parse_mode - message parse mode type
+            - disable_web_page_preview - if it is needed to disable link preview
             - photo      - photo to send (you shouldn't pass text param if you want to send photo)
             - caption    - caption for photo
             For markups see https://core.telegram.org/bots/api#replykeyboardmarkup
@@ -144,6 +145,7 @@ class Telegram:
             message = message_payload['text']
 
             parse_mode = message_payload.get('parse_mode', None)
+            disable_web_page_preview = message_payload.get('disable_web_page_preview', False)
 
             if 'markup' in message_payload:
                 markup = message_payload['markup']
@@ -152,7 +154,7 @@ class Telegram:
                                               markup.get('remove_keyboard', None),
                                               markup.get('force_reply', None))
 
-            self.message.send(chat_id, message, parse_mode)
+            self.message.send(chat_id, message, parse_mode, disable_web_page_preview)
             return
 
         if 'photo' in message_payload:

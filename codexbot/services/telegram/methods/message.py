@@ -11,7 +11,7 @@ class Message(Base):
     }
 
     @message
-    def send(self, text, parse_mode=None, disable_web_page_preview=True, **kwargs):
+    def send(self, text, parse_mode=None, disable_web_page_preview=False, **kwargs):
         """
         Send message to chat
         Use @message decorator
