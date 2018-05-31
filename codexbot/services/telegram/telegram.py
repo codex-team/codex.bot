@@ -1,3 +1,4 @@
+import json
 import logging
 from urllib.parse import urlencode
 
@@ -108,9 +109,15 @@ class Telegram:
         self.broker = broker
         self.set_webhook()
 
-    def set_webhook(self):
-        query = self.__api_url + 'setWebhook?' + urlencode({
-            'url': self.__callback_url
+    def set_webhook(self, api_token=None, callback_url=None):
+        if not api_token:
+            api_token = API_TOKEN
+
+        if not callback_url:
+            callback_url = CALLBACK_ROUTE
+
+        query = API_URL + api_token + '/setWebhook?' + urlencode({
+            'url': URL + callback_url
         })
 
         try:
@@ -118,7 +125,17 @@ class Telegram:
         except Exception as e:
             logging.debug(e)
         else:
-            logging.debug(result.content)
+            result_content = result.content
+            logging.debug(result_content)
+            return result_content
+
+    def del_webhook(self, api_token):
+        try:
+            result = requests.get(API_URL + api_token + '/deleteWebhook')
+        except Exception as e:
+            logging.debug(e)
+        else:
+            logging.debug(result)
 
     def send(self, chat_id, message_payload):
         """
@@ -164,3 +181,15 @@ class Telegram:
                 caption = message_payload['caption']
             self.photo.send(chat_id, photo, caption)
             return
+
+    def getMe(self, api_token=None):
+        if not api_token:
+            api_token = self.__token
+
+        try:
+            result = requests.get(API_URL + api_token + "/getMe")
+            data = json.loads(result.content)
+            return data
+
+        except Exception as e:
+            logging.debug(e)

@@ -15,9 +15,9 @@ class Core:
 
     def __init__(self):
         self.services = {}
-
         self.logging = Logging()
         self.init_i18n()
+        self.overload_settings()
         self.event_loop = asyncio.get_event_loop()
         self.init_db()
         self.init_broker()
@@ -25,6 +25,17 @@ class Core:
         self.init_services()
         self.init_queue()
         self.server.start()
+
+    def overload_settings(self):
+        import argparse
+        parser = argparse.ArgumentParser()
+        parser.add_argument('--host', help="local port")
+        parser.add_argument('--port', help="local port")
+        args = parser.parse_args()
+        if args.host:
+            SERVER['host'] = args.host
+        if args.port:
+            SERVER['port'] = int(args.port)
 
     # TODO создать отдельный модуль для подключения словарей к модулям
     #      но это не точно

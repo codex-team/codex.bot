@@ -8,6 +8,7 @@ import logging
 
 class API:
     APPS_COLLECTION_NAME = 'apps'
+    BOTS_COLLECTION_NAME = 'bots'
     COMMANDS_COLLECTION_NAME = 'commands'
     PENDING_APPS_COLLECTION_NAME = 'pending_apps'
 
