@@ -63,7 +63,8 @@ class Broker:
             payload = {
                 'text': message_data['text'],
                 'chat': chat_hash,
-                'user': user_hash
+                'user': user_hash,
+                'bot': message_data.get('bot', None)
             }
 
             self.api.reset_pending(self.api.pending_apps[key])
@@ -94,8 +95,9 @@ class Broker:
                     'command': incoming_cmd['command'],
                     'params': incoming_cmd['payload'],
                     'chat': chat_hash,
-                    'user': user_hash
-                }
+                    'user': user_hash,
+                    'bot': message_data.get('bot', None)
+                },
             })
 
             await self.add_to_app_queue(message, app['queue'], app['host'])
@@ -112,6 +114,7 @@ class Broker:
             'data': data,
             'chat': chat_hash,
             'user': user_hash,
+            'bot': query.get('bot', None)
         }
 
         await self.api.send_command('callback query', payload, app)

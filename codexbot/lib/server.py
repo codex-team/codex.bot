@@ -8,6 +8,7 @@ def http_response(function):
         headers = request.headers
         params = request.match_info
         query = request.query
+
         try:
             json = await request.json()
         except Exception as e:

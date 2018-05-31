@@ -146,15 +146,16 @@ class AppManager:
         bot = {
             'owner': chat_hash,
             'api_token': api_token,
-            'uri_hash': self.generate_app_token(),
             'name': data['result']['username'],
+            'bot_id': data['result']['id']
         }
 
         logging.debug("/addbot with params", bot)
 
-        messenger_service.set_webhook(api_token, "/telegram/bot/{}".format(bot['uri_hash']))
+        messenger_service.set_webhook(api_token, "/telegram/callback?bot={}".format(bot['bot_id']))
 
         self.db.insert(self.api.BOTS_COLLECTION_NAME, bot)
+        self.api.load_bot(bot)
 
         messenger_service.send(chat['id'], {'text': _('Your bot «{}» was successfully hijacked.').format(bot['name'])})
 
@@ -176,6 +177,7 @@ class AppManager:
             return
 
         api_token = bot['api_token']
+        del self.api.bots[bot['name']]
         self.db.remove(self.api.BOTS_COLLECTION_NAME, bot)
         messenger_service.del_webhook(api_token)
         messenger_service.send(chat['id'], {

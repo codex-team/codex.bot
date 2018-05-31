@@ -47,7 +47,7 @@ class Telegram:
         logging.info("Got telegram callback {}".format(params['json']))
 
         # Parse telegram message
-        update = Update(params['json'])
+        update = Update(params)
 
         if update.message:
             await self.send_message_to_app(update)
@@ -55,8 +55,8 @@ class Telegram:
             await self.send_callback_query_to_app(update)
 
         return {
-            'text' : 'ok',
-            'status' : 200
+            'text': 'ok',
+            'status': 200
         }
 
     async def send_message_to_app(self, update):
@@ -78,7 +78,8 @@ class Telegram:
             },
             'service': self.__name__,
             'commands': update.get_commands(),
-            'text': update.message.text
+            'text': update.message.text,
+            'bot': update.bot_id
         })
 
     async def send_callback_query_to_app(self, update):
@@ -98,7 +99,8 @@ class Telegram:
                 'lang': update.callback_query.user.language_code
             },
             'service': self.__name__,
-            'data': update.callback_query.data
+            'data': update.callback_query.data,
+            'bot': update.bot_id
         })
 
     def run(self, broker):
@@ -108,6 +110,7 @@ class Telegram:
         """
         self.broker = broker
         self.set_webhook()
+        #TODO: Maybe to reset webhooks for hijacked bots
 
     def set_webhook(self, api_token=None, callback_url=None):
         if not api_token:
@@ -158,6 +161,16 @@ class Telegram:
         :param chat_id: 
         :return: 
         """
+        bot = message_payload.get('bot', None)
+        if bot:
+            bot = self.broker.api.bots.get(bot, None)
+            if not bot:
+                logging.debug("Bot not found!", message_payload)
+                return
+            bot_token = bot['api_token']
+        else:
+            bot_token = None
+
         if 'text' in message_payload:
             message = message_payload['text']
 
@@ -171,7 +184,7 @@ class Telegram:
                                               markup.get('remove_keyboard', None),
                                               markup.get('force_reply', None))
 
-            self.message.send(chat_id, message, parse_mode, disable_web_page_preview)
+            self.message.send(chat_id, message, parse_mode, disable_web_page_preview, bot_token=bot_token)
             return
 
         if 'photo' in message_payload:
@@ -179,7 +192,7 @@ class Telegram:
             caption = None
             if 'caption' in message_payload:
                 caption = message_payload['caption']
-            self.photo.send(chat_id, photo, caption)
+            self.photo.send(chat_id, photo, caption, bot=bot)
             return
 
     def getMe(self, api_token=None):

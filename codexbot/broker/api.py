@@ -29,7 +29,9 @@ class API:
 
         # Generate list of applications (self.apps)
         self.apps = {}
+        self.bots = {}
         self.load_apps()
+        self.load_bots()
 
         self.pending_apps = {}
         self.load_pending_apps()
@@ -50,6 +52,14 @@ class API:
         apps_list = self.db.find(API.APPS_COLLECTION_NAME, {})
         for app in apps_list:
             self.load_app(app)
+
+    def load_bots(self):
+        bots_list = self.db.find(API.BOTS_COLLECTION_NAME, {})
+        for bot in bots_list:
+            self.load_bot(bot)
+
+    def load_bot(self, bot_data):
+        self.bots[bot_data['name']] = bot_data
 
     def load_app(self, app_data):
         """
