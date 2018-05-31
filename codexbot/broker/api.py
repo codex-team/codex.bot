@@ -59,7 +59,7 @@ class API:
             self.load_bot(bot)
 
     def load_bot(self, bot_data):
-        self.bots[bot_data['name']] = bot_data
+        self.bots[bot_data['bot_id']] = bot_data
 
     def load_app(self, app_data):
         """

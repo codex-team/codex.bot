@@ -20,7 +20,7 @@ class Update:
             data = loads(data)
 
         self.id = data['update_id']
-        self.bot_id = request_params['query'].get('bot_id', None)
+        self.bot_id = request_params['params'].get('bot', None)
 
         if 'message' in data:
             self.message = Message(data['message'])

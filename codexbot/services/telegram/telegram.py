@@ -28,6 +28,7 @@ class Telegram:
         self.__bot_name = BOT_NAME
 
         self.routes = [
+            ('POST', CALLBACK_ROUTE + '/{bot:.*}', self.telegram_callback),
             ('POST', CALLBACK_ROUTE, self.telegram_callback)
         ]
 
@@ -163,7 +164,7 @@ class Telegram:
         """
         bot = message_payload.get('bot', None)
         if bot:
-            bot = self.broker.api.bots.get(bot, None)
+            bot = self.broker.api.bots.get(int(bot), None)
             if not bot:
                 logging.debug("Bot not found!", message_payload)
                 return

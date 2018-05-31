@@ -152,7 +152,7 @@ class AppManager:
 
         logging.debug("/addbot with params", bot)
 
-        messenger_service.set_webhook(api_token, "/telegram/callback?bot={}".format(bot['bot_id']))
+        messenger_service.set_webhook(api_token, "/telegram/callback/{}".format(bot['bot_id']))
 
         self.db.insert(self.api.BOTS_COLLECTION_NAME, bot)
         self.api.load_bot(bot)
@@ -177,7 +177,7 @@ class AppManager:
             return
 
         api_token = bot['api_token']
-        del self.api.bots[bot['name']]
+        del self.api.bots[bot['bot_id']]
         self.db.remove(self.api.BOTS_COLLECTION_NAME, bot)
         messenger_service.del_webhook(api_token)
         messenger_service.send(chat['id'], {
