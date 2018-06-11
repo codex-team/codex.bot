@@ -6,9 +6,9 @@ class SystemCommand:
     def __init__(self, api):
 
         self.commands = {
-            'apps': self.apps,
             'start': self.help,
             'help': self.help,
+            'apps': self.apps,
             'bots': self.bots
         }
         self.api = api

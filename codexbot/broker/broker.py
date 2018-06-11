@@ -5,7 +5,7 @@ import string
 
 from codexbot.globalcfg import RABBITMQ
 from codexbot.lib.rabbitmq import add_message_to_queue, init_receiver
-from codexbot.systemapps.appmanager import AppManager
+from codexbot.systemapps.appmanager import Manager
 from codexbot.systemapps.systemcommands import SystemCommand
 from .api import API
 
@@ -23,7 +23,7 @@ class Broker:
         self.core = core
         self.event_loop = event_loop
         self.api = API(self)
-        self.app_manager = AppManager(self)
+        self.app_manager = Manager(self)
         self.system_commands = SystemCommand(self.api)
 
 
