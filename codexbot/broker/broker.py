@@ -74,12 +74,14 @@ class Broker:
         for incoming_cmd in message_data['commands']:
 
             if incoming_cmd['command'] in self.app_manager.commands:
-                self.app_manager.process(chat_hash, incoming_cmd)
+                if message_data['bot'] is None:
+                    self.app_manager.process(chat_hash, incoming_cmd)
                 continue
 
             # Handle core-predefined command
             if incoming_cmd['command'] in self.system_commands.commands:
-                await self.system_commands.commands[incoming_cmd['command']](chat_hash, incoming_cmd['payload'])
+                if message_data['bot'] is None:
+                    await self.system_commands.commands[incoming_cmd['command']](chat_hash, incoming_cmd['payload'])
                 return True
 
             command_data = self.api.commands.get(incoming_cmd['command'])
