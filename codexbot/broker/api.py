@@ -204,12 +204,13 @@ class API:
         """
         Find service by chat_hash and pass there message_payload:
         :param message_payload:
-            - chat_hash  - chat hash
-            - text       - message text
-            – update_id  – message id for update. None if add new.
-            - parse_mode - message parse mode type
-            - photo      - photo to send (you shouldn't pass text param if you want to send photo)
-            - caption    - caption for photo
+            - chat_hash     - chat hash
+            - text          - message text
+            – update_id     – message id for update. None if add new.
+            – want_response – if you want to get response from service to app queue. default = False.
+            - parse_mode    - message parse mode type
+            - photo         - photo to send (you shouldn't pass text param if you want to send photo)
+            - caption       - caption for photo
             For markups see https://core.telegram.org/bots/api#replykeyboardmarkup
             - markup:
                 - keyboard

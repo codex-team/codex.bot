@@ -147,13 +147,14 @@ class Telegram:
         Send message to chat
         
          :param message_payload:
-            - chat_hash  - chat hash
-            - text       - message text
-            – update_id  – message id for update. None if add new.
-            - parse_mode - message parse mode type
+            - chat_hash     - chat hash
+            - text          - message text
+            – update_id     – message id for update. None if add new.
+            – want_response – if you want to get response from service to app queue. default = False.
+            - parse_mode    - message parse mode type
             - disable_web_page_preview - if it is needed to disable link preview
-            - photo      - photo to send (you shouldn't pass text param if you want to send photo)
-            - caption    - caption for photo
+            - photo         - photo to send (you shouldn't pass text param if you want to send photo)
+            - caption       - caption for photo
             For markups see https://core.telegram.org/bots/api#replykeyboardmarkup
             - markup:
                 - keyboard
@@ -197,7 +198,7 @@ class Telegram:
                                               markup.get('force_reply', None))
 
             result = self.message.send(chat_id, message, parse_mode, disable_web_page_preview, bot_token=bot_token, update_id=update_id)
-            if result:
+            if message_payload.get('want_response', False) and result:
                 message = json.dumps({
                     'command': 'callback query',
                     'payload': result['result'],
