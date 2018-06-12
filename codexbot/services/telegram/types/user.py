@@ -11,6 +11,7 @@ class User:
         self.last_name = None
         self.username = None
         self.language_code = None
+        self.is_bot = False
 
         if type(data) == str:
             data = loads(data)
@@ -26,3 +27,6 @@ class User:
 
         if 'language_code' in data:
             self.language_code = data['language_code']
+
+        if 'is_bot' in data:
+            self.is_bot = data['is_bot'] == "true"

@@ -2,6 +2,8 @@ import requests
 import logging
 import json
 
+from codexbot.services.telegram.config import API_URL
+
 
 def message(function):
     """
@@ -18,6 +20,7 @@ def message(function):
         :argument reply_to_message_id: message to reply
         :argument disable_notification: if True, sending message silently
         :argument reply_markup: Telegram reply_markup object. Could be set by set_reply_markup
+        :argument bot: Telegram bot ID. None if it is the core bot.
         
         :param self: 
         :param chat_id: 
@@ -47,11 +50,15 @@ def message(function):
         if 'files' in data:
             files = data['files']
 
+        api_url = self.api_url
+        if 'bot_token' in kwargs and kwargs['bot_token']:
+            api_url = API_URL + kwargs['bot_token'] + "/"
+
         if len(files.keys()):
             data['payload']['reply_markup'] = json.dumps(data['payload']['reply_markup'])
-            result = requests.post(self.api_url + data['method'], data=data['payload'], files=files)
+            result = requests.post(api_url + data['method'], data=data['payload'], files=files)
         else:
-            result = requests.post(self.api_url + data['method'], json=data['payload'])
+            result = requests.post(api_url + data['method'], json=data['payload'])
 
         self.clear_reply_markup()
 

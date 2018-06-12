@@ -8,6 +8,8 @@ import logging
 
 class API:
     APPS_COLLECTION_NAME = 'apps'
+    BOTS_COLLECTION_NAME = 'bots'
+    BOT_APP_LINKS_COLLECTION_NAME = 'bot_app_links'
     COMMANDS_COLLECTION_NAME = 'commands'
     PENDING_APPS_COLLECTION_NAME = 'pending_apps'
 
@@ -28,7 +30,9 @@ class API:
 
         # Generate list of applications (self.apps)
         self.apps = {}
+        self.bots = {}
         self.load_apps()
+        self.load_bots()
 
         self.pending_apps = {}
         self.load_pending_apps()
@@ -40,7 +44,6 @@ class API:
         for command in commands:
             self.commands[command['name']] = (command['description'], command['app_token'])
 
-
     def load_apps(self):
         """
         Load applications dictionary from DB into self.apps as dict('hash' => JSON))
@@ -49,6 +52,15 @@ class API:
         apps_list = self.db.find(API.APPS_COLLECTION_NAME, {})
         for app in apps_list:
             self.load_app(app)
+
+    def load_bots(self):
+        bots_list = self.db.find(API.BOTS_COLLECTION_NAME, {})
+        for bot in bots_list:
+            self.load_bot(bot)
+
+    def load_bot(self, bot_data):
+        bots_links = self.db.find(API.BOT_APP_LINKS_COLLECTION_NAME, {'bot_name': bot_data['name']})
+        self.bots[bot_data['bot_id']] = {'data': bot_data, 'apps': set([link['app_name'] for link in bots_links])}
 
     def load_app(self, app_data):
         """

@@ -77,6 +77,11 @@ class InlineKeyboard(Base):
     # https://core.telegram.org/bots/api#inlinekeyboardmarkup
     __name__ = "Telegram Inline Keyboard Markup"
 
+    def __init__(self, *rows):
+        super(InlineKeyboard, self).__init__()
+        for row in rows:
+            self.row(*row)
+
     # https://core.telegram.org/bots/api#keyboardbutton
     @staticmethod
     def button(text, callback_data=None, url=None, switch_inline_query=None, switch_inline_query_current_chat=None):

@@ -5,7 +5,7 @@ import string
 
 from codexbot.globalcfg import RABBITMQ
 from codexbot.lib.rabbitmq import add_message_to_queue, init_receiver
-from codexbot.systemapps.appmanager import AppManager
+from codexbot.systemapps.appmanager import Manager
 from codexbot.systemapps.systemcommands import SystemCommand
 from .api import API
 
@@ -23,7 +23,7 @@ class Broker:
         self.core = core
         self.event_loop = event_loop
         self.api = API(self)
-        self.app_manager = AppManager(self)
+        self.app_manager = Manager(self)
         self.system_commands = SystemCommand(self.api)
 
 
@@ -63,22 +63,27 @@ class Broker:
             payload = {
                 'text': message_data['text'],
                 'chat': chat_hash,
-                'user': user_hash
+                'user': user_hash,
+                'bot': message_data.get('bot', None)
             }
 
             self.api.reset_pending(self.api.pending_apps[key])
             await self.api.send_command('user answer', payload, app)
             return
 
+        bot_id = message_data['bot']
+
         for incoming_cmd in message_data['commands']:
 
             if incoming_cmd['command'] in self.app_manager.commands:
-                self.app_manager.process(chat_hash, incoming_cmd)
+                if bot_id is None:
+                    self.app_manager.process(chat_hash, incoming_cmd)
                 continue
 
             # Handle core-predefined command
             if incoming_cmd['command'] in self.system_commands.commands:
-                await self.system_commands.commands[incoming_cmd['command']](chat_hash, incoming_cmd['payload'])
+                if message_data['bot'] is None:
+                    await self.system_commands.commands[incoming_cmd['command']](chat_hash, incoming_cmd['payload'])
                 return True
 
             command_data = self.api.commands.get(incoming_cmd['command'])
@@ -88,14 +93,20 @@ class Broker:
 
             app = self.api.apps[command_data[1]]
 
+            if bot_id is not None:
+                # check if bot is linked to the app
+                if app['name'] not in self.api.bots[int(bot_id)]['apps']:
+                    continue
+
             message = json.dumps({
                 'command': 'service callback',
                 'payload': {
                     'command': incoming_cmd['command'],
                     'params': incoming_cmd['payload'],
                     'chat': chat_hash,
-                    'user': user_hash
-                }
+                    'user': user_hash,
+                    'bot': message_data.get('bot', None)
+                },
             })
 
             await self.add_to_app_queue(message, app['queue'], app['host'])
@@ -103,15 +114,20 @@ class Broker:
     async def callback_query_to_app(self, query):
         (app_token, data) = query['data'].split(' ', 1)
 
-        app = self.api.apps[app_token]
         chat_hash = self.get_chat_hash(query)
         user_hash = self.get_user_hash(query)
 
+        if app_token.startswith('core_'):
+            self.app_manager.process(chat_hash, {'command': app_token[5:], 'payload': data})
+            return
+
+        app = self.api.apps[app_token]
 
         payload = {
             'data': data,
             'chat': chat_hash,
             'user': user_hash,
+            'bot': query.get('bot', None)
         }
 
         await self.api.send_command('callback query', payload, app)

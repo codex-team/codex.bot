@@ -9,15 +9,18 @@ class Update:
     # https://core.telegram.org/bots/api#update
     __name__ = "Telegram Update"
 
-    def __init__(self, data):
+    def __init__(self, request_params):
 
         self.message = None
         self.callback_query = None
+
+        data = request_params['json']
 
         if type(data) is str:
             data = loads(data)
 
         self.id = data['update_id']
+        self.bot_id = request_params['params'].get('bot', None)
 
         if 'message' in data:
             self.message = Message(data['message'])
