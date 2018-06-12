@@ -77,7 +77,7 @@ class Broker:
 
             if incoming_cmd['command'] in self.app_manager.commands:
                 if bot_id is None:
-                    self.app_manager.process(chat_hash, incoming_cmd)
+                    await self.app_manager.process(chat_hash, incoming_cmd)
                 continue
 
             # Handle core-predefined command
@@ -118,7 +118,7 @@ class Broker:
         user_hash = self.get_user_hash(query)
 
         if app_token.startswith('core_'):
-            self.app_manager.process(chat_hash, {'command': app_token[5:], 'payload': data})
+            await self.app_manager.process(chat_hash, {'command': app_token[5:], 'payload': data})
             return
 
         app = self.api.apps[app_token]

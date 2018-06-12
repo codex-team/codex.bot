@@ -1,5 +1,3 @@
-import random
-import string
 import gettext
 import logging
 
@@ -36,9 +34,9 @@ class Manager:
             'unlink': self.bot_app_manager.unapply_link
         }
 
-    def process(self, chat_hash, command_data):
+    async def process(self, chat_hash, command_data):
         if command_data['command'] in self.commands:
-            self.commands[command_data['command']](chat_hash, command_data['payload'])
+            await self.commands[command_data['command']](chat_hash, command_data['payload'])
         else:
             logging.error("Command not found: ", command_data)
 

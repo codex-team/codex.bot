@@ -1,15 +1,12 @@
-import logging
 import random
 import string
 
-from codexbot.components.useful import grouped
-from codexbot.services.telegram.types.markups import InlineKeyboard
 from codexbot.systemapps.botmanager.base import ManagerBase
 
 
 class AppManager(ManagerBase):
 
-    def show_apps(self, chat_hash, command_payload):
+    async def show_apps(self, chat_hash, command_payload):
         """
         Get all registered apps by owner field
 
@@ -28,12 +25,12 @@ class AppManager(ManagerBase):
         else:
             message = 'There are no registered apps. Add new app using command /newapp {name} {host}.'
 
-        messenger_service.send(
+        await messenger_service.send(
             chat['id'],
             {'text': message}
         )
 
-    def add_app(self, chat_hash, app_data):
+    async def add_app(self, chat_hash, app_data):
         """
         Register new app by command /newapp {app_name} {app_host}
         app_name - name of new app.
@@ -80,7 +77,7 @@ class AppManager(ManagerBase):
                 self.api.load_app(app)
                 message = 'Your app was successfully registered. Your token - {}'.format(app['token'])
 
-        messenger_service.send(
+        await messenger_service.send(
             chat['id'],
             {'text': message}
         )

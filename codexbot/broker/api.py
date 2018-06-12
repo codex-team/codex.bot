@@ -225,11 +225,13 @@ class API:
 
         chat = self.db.find_one('chats', {'hash': chat_hash})
 
+        current_app = self.apps[app_token] if app_token in self.apps else None
+
         if not chat:
-            await self.send_message(self.broker.WRONG, 'Error', self.apps[app_token])
+            await self.send_message(self.broker.WRONG, 'Error', current_app)
             return
 
-        await self.broker.core.services[chat['service']].send(chat['id'], message_payload, app=self.apps[app_token])
+        await self.broker.core.services[chat['service']].send(chat['id'], message_payload, app=current_app)
 
     async def wait_user_answer(self, app_token, payload):
         """

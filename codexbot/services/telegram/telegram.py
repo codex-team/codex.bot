@@ -142,7 +142,7 @@ class Telegram:
         else:
             logging.debug(result)
 
-    async def send(self, chat_id, message_payload, app):
+    async def send(self, chat_id, message_payload, app=None):
         """
         Send message to chat
         
@@ -198,7 +198,7 @@ class Telegram:
                                               markup.get('force_reply', None))
 
             result = self.message.send(chat_id, message, parse_mode, disable_web_page_preview, bot_token=bot_token, update_id=update_id)
-            if message_payload.get('want_response', False) and result:
+            if app and message_payload.get('want_response', False) and result:
                 message = json.dumps({
                     'command': 'callback query',
                     'payload': result['result'],
