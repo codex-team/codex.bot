@@ -49,7 +49,6 @@ class BotAppLink(AppManager):
                 }
             })
 
-
     def apply_link(self, chat_hash, data):
         chat = self.db.find_one('chats', {'hash': chat_hash})
         messenger_service = self.core.services[chat['service']]
@@ -73,7 +72,11 @@ class BotAppLink(AppManager):
             }
 
             if not self.db.find_one(self.api.BOT_APP_LINKS_COLLECTION_NAME, lnk):
-                self.db.insert(self.api.BOT_APP_LINKS_COLLECTION_NAME, lnk)
+                if self.db.insert(self.api.BOT_APP_LINKS_COLLECTION_NAME, lnk):
+                    self.api.load_bots()
+                    messenger_service.send(chat['id'], {'text': '{} is successfully linked to {}.'.format(bot_name, app_name)})
+                else:
+                    messenger_service.send(chat['id'], {'text': 'Failed to link {} to {}.'.format(bot_name, app_name)})
             else:
                 messenger_service.send(chat['id'], {'text': '{} is already linked to {}.'.format(bot_name, app_name)})
 
@@ -101,6 +104,7 @@ class BotAppLink(AppManager):
                 'bot_name': bot_name,
                 'owner': chat_hash
             }):
+                self.api.load_bots()
                 messenger_service.send(chat['id'], {'text': '{} is successfully unlinked from {}.'.format(app_name, bot_name)})
             else:
                 messenger_service.send(chat['id'], {'text': 'Error. Maybe it is already unlinked.'})

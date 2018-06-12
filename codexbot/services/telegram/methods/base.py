@@ -51,7 +51,7 @@ def message(function):
             files = data['files']
 
         api_url = self.api_url
-        if kwargs['bot_token']:
+        if 'bot_token' in kwargs and kwargs['bot_token']:
             api_url = API_URL + kwargs['bot_token'] + "/"
 
         if len(files.keys()):

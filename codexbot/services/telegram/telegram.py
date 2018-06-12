@@ -168,7 +168,7 @@ class Telegram:
             if not bot:
                 logging.debug("Bot not found!", message_payload)
                 return
-            bot_token = bot['api_token']
+            bot_token = bot['data']['api_token']
         else:
             bot_token = None
 
@@ -193,7 +193,7 @@ class Telegram:
             caption = None
             if 'caption' in message_payload:
                 caption = message_payload['caption']
-            self.photo.send(chat_id, photo, caption, bot=bot)
+            self.photo.send(chat_id, photo, caption, bot_token=bot_token)
             return
 
     def getMe(self, api_token=None):

@@ -71,10 +71,12 @@ class Broker:
             await self.api.send_command('user answer', payload, app)
             return
 
+        bot_id = message_data['bot']
+
         for incoming_cmd in message_data['commands']:
 
             if incoming_cmd['command'] in self.app_manager.commands:
-                if message_data['bot'] is None:
+                if bot_id is None:
                     self.app_manager.process(chat_hash, incoming_cmd)
                 continue
 
@@ -90,6 +92,11 @@ class Broker:
                 continue
 
             app = self.api.apps[command_data[1]]
+
+            if bot_id is not None:
+                # check if bot is linked to the app
+                if app['name'] not in self.api.bots[int(bot_id)]['apps']:
+                    continue
 
             message = json.dumps({
                 'command': 'service callback',

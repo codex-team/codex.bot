@@ -44,7 +44,6 @@ class API:
         for command in commands:
             self.commands[command['name']] = (command['description'], command['app_token'])
 
-
     def load_apps(self):
         """
         Load applications dictionary from DB into self.apps as dict('hash' => JSON))
@@ -60,7 +59,8 @@ class API:
             self.load_bot(bot)
 
     def load_bot(self, bot_data):
-        self.bots[bot_data['bot_id']] = bot_data
+        bots_links = self.db.find(API.BOT_APP_LINKS_COLLECTION_NAME, {'bot_name': bot_data['name']})
+        self.bots[bot_data['bot_id']] = {'data': bot_data, 'apps': set([link['app_name'] for link in bots_links])}
 
     def load_app(self, app_data):
         """
