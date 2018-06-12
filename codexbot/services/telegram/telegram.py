@@ -8,6 +8,7 @@ from codexbot.globalcfg import URL
 from codexbot.lib.server import http_response
 from .config import BOT_NAME, API_TOKEN, API_URL, CALLBACK_ROUTE
 from .methods.message import Message
+from .types.message import Message as MessageType
 from .methods.photo import Photo
 from .methods.sticker import Sticker
 from .methods.video import Video
@@ -141,17 +142,19 @@ class Telegram:
         else:
             logging.debug(result)
 
-    def send(self, chat_id, message_payload):
+    async def send(self, chat_id, message_payload, app):
         """
         Send message to chat
         
          :param message_payload:
-            - chat_hash  - chat hash
-            - text       - message text
-            - parse_mode - message parse mode type
+            - chat_hash     - chat hash
+            - text          - message text
+            – update_id     – message id for update. None if add new.
+            – want_response – if you want to get response from service to app queue. default = False.
+            - parse_mode    - message parse mode type
             - disable_web_page_preview - if it is needed to disable link preview
-            - photo      - photo to send (you shouldn't pass text param if you want to send photo)
-            - caption    - caption for photo
+            - photo         - photo to send (you shouldn't pass text param if you want to send photo)
+            - caption       - caption for photo
             For markups see https://core.telegram.org/bots/api#replykeyboardmarkup
             - markup:
                 - keyboard
@@ -159,7 +162,14 @@ class Telegram:
                 - remove_keyboard
                 - force_reply
         
-        :param chat_id: 
+        :param chat_id:
+        :param app_data: dict
+            'token':        application token,
+            'name':         application name,
+            'queue':        queue name,
+            'host':         application host address,
+            'port':         application port,
+            'description':  application description
         :return: 
         """
         bot = message_payload.get('bot', None)
@@ -171,6 +181,8 @@ class Telegram:
             bot_token = bot['data']['api_token']
         else:
             bot_token = None
+
+        update_id = message_payload.get('update_id', None)
 
         if 'text' in message_payload:
             message = message_payload['text']
@@ -185,7 +197,13 @@ class Telegram:
                                               markup.get('remove_keyboard', None),
                                               markup.get('force_reply', None))
 
-            self.message.send(chat_id, message, parse_mode, disable_web_page_preview, bot_token=bot_token)
+            result = self.message.send(chat_id, message, parse_mode, disable_web_page_preview, bot_token=bot_token, update_id=update_id)
+            if message_payload.get('want_response', False) and result:
+                message = json.dumps({
+                    'command': 'callback query',
+                    'payload': result['result'],
+                })
+                await self.broker.add_to_app_queue(message, app['queue'], app['host'])
             return
 
         if 'photo' in message_payload:
@@ -193,7 +211,7 @@ class Telegram:
             caption = None
             if 'caption' in message_payload:
                 caption = message_payload['caption']
-            self.photo.send(chat_id, photo, caption, bot_token=bot_token)
+            self.photo.send(chat_id, photo, caption, bot_token=bot_token, update_id=update_id)
             return
 
     def getMe(self, api_token=None):

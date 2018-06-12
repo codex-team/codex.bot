@@ -204,11 +204,13 @@ class API:
         """
         Find service by chat_hash and pass there message_payload:
         :param message_payload:
-            - chat_hash  - chat hash
-            - text       - message text
-            - parse_mode - message parse mode type
-            - photo      - photo to send (you shouldn't pass text param if you want to send photo)
-            - caption    - caption for photo
+            - chat_hash     - chat hash
+            - text          - message text
+            – update_id     – message id for update. None if add new.
+            – want_response – if you want to get response from service to app queue. default = False.
+            - parse_mode    - message parse mode type
+            - photo         - photo to send (you shouldn't pass text param if you want to send photo)
+            - caption       - caption for photo
             For markups see https://core.telegram.org/bots/api#replykeyboardmarkup
             - markup:
                 - keyboard
@@ -227,7 +229,7 @@ class API:
             await self.send_message(self.broker.WRONG, 'Error', self.apps[app_token])
             return
 
-        self.broker.core.services[chat['service']].send(chat['id'], message_payload)
+        await self.broker.core.services[chat['service']].send(chat['id'], message_payload, app=self.apps[app_token])
 
     async def wait_user_answer(self, app_token, payload):
         """
