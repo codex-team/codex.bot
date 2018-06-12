@@ -66,7 +66,10 @@ def message(function):
             logging.debug('Error while sending Telegram message: {}'.format(result.content))
             return False
 
-        return True
+        try:
+            return json.loads(result.text)
+        except:
+            return False
 
     return decorator
 

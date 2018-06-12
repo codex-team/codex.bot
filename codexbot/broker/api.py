@@ -206,6 +206,7 @@ class API:
         :param message_payload:
             - chat_hash  - chat hash
             - text       - message text
+            – update_id  – message id for update. None if add new.
             - parse_mode - message parse mode type
             - photo      - photo to send (you shouldn't pass text param if you want to send photo)
             - caption    - caption for photo
@@ -227,7 +228,7 @@ class API:
             await self.send_message(self.broker.WRONG, 'Error', self.apps[app_token])
             return
 
-        self.broker.core.services[chat['service']].send(chat['id'], message_payload)
+        await self.broker.core.services[chat['service']].send(chat['id'], message_payload, app=self.apps[app_token])
 
     async def wait_user_answer(self, app_token, payload):
         """

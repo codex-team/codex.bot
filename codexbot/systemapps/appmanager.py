@@ -42,13 +42,3 @@ class Manager:
         else:
             logging.error("Command not found: ", command_data)
 
-    @staticmethod
-    def generate_app_token(size=8, chars=string.ascii_uppercase + string.digits):
-        """
-        Generate unique string
-        Application will use this token for authentication
-        :param size: size in symbols
-        :param chars: letters used
-        :return: string token
-        """
-        return ''.join(random.SystemRandom().choice(chars) for _ in range(size))

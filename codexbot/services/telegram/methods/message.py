@@ -7,11 +7,12 @@ class Message(Base):
 
     methods = {
         'send': 'sendMessage',
+        'edit': 'editMessageText',
         'forward': 'forwardMessage'
     }
 
     @message
-    def send(self, text, parse_mode=None, disable_web_page_preview=False, **kwargs):
+    def send(self, text, parse_mode=None, disable_web_page_preview=False, update_id=None, **kwargs):
         """
         Send message to chat
         Use @message decorator
@@ -34,10 +35,12 @@ class Message(Base):
             payload['parse_mode'] = parse_mode
         if disable_web_page_preview:
             payload['disable_web_page_preview'] = disable_web_page_preview
+        if update_id:
+            payload['message_id'] = int(update_id)
 
         return {
             'payload': payload,
-            'method': self.methods['send']
+            'method': self.methods['send'] if not update_id else self.methods['edit']
         }
 
     @message

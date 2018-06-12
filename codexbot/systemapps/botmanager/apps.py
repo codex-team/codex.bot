@@ -1,4 +1,6 @@
 import logging
+import random
+import string
 
 from codexbot.components.useful import grouped
 from codexbot.services.telegram.types.markups import InlineKeyboard
@@ -82,3 +84,14 @@ class AppManager(ManagerBase):
             chat['id'],
             {'text': message}
         )
+
+    @staticmethod
+    def generate_app_token(size=8, chars=string.ascii_uppercase + string.digits):
+        """
+        Generate unique string
+        Application will use this token for authentication
+        :param size: size in symbols
+        :param chars: letters used
+        :return: string token
+        """
+        return ''.join(random.SystemRandom().choice(chars) for _ in range(size))
