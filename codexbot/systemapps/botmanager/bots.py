@@ -20,7 +20,7 @@ class BotManager(ManagerBase):
         messenger_service = self.core.services[chat['service']]
 
         if len(bots):
-            buttons = grouped([InlineKeyboard.button(bot['name'], callback_data='/bot {}'.format(bot['bot_id'])) for bot in bots], 2)
+            buttons = grouped([InlineKeyboard.button(bot['name'], callback_data='core_botmenu {}'.format(bot['bot_id'])) for bot in bots], 2)
             messenger_service.send(chat['id'], {
                 'text': 'Choose bot to modify settings',
                 'markup': {
@@ -101,3 +101,18 @@ class BotManager(ManagerBase):
         messenger_service.send(chat['id'], {
             'text': 'Bot «{}» successfully delete. Webhook has been unset'.format(bot['name'])
         })
+
+    def bot_menu(self, chat_hash, bot_id):
+        chat = self.db.find_one('chats', {'hash': chat_hash})
+        messenger_service = self.core.services[chat['service']]
+
+        bot = self.db.find_one(self.api.BOTS_COLLECTION_NAME, {'bot_id': int(bot_id), 'owner': chat_hash})
+        if not bot:
+            messenger_service.send(chat['id'], {
+                'text': 'Bot is undefined. Error! Alarm! Code: {}'.format(bot_id)
+            })
+        else:
+            messenger_service.send(chat['id'], {
+                'text': 'Your bot «{}» is just awesome\nYou can:\n/delbot {} – delete it\n/linkbot {} – configure available applications'.format(bot['name'], bot['name'], bot['name'])
+            })
+

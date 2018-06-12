@@ -107,10 +107,14 @@ class Broker:
     async def callback_query_to_app(self, query):
         (app_token, data) = query['data'].split(' ', 1)
 
-        app = self.api.apps[app_token]
         chat_hash = self.get_chat_hash(query)
         user_hash = self.get_user_hash(query)
 
+        if app_token.startswith('core_'):
+            self.app_manager.process(chat_hash, {'command': app_token[5:], 'payload': data})
+            return
+
+        app = self.api.apps[app_token]
 
         payload = {
             'data': data,
