@@ -11,9 +11,9 @@ class Base:
     def row(self, *args):
         """
         Append arguments to keyboard as new row
-        
-        :param args: Reply or Inline Keyboard objects 
-        :return: 
+
+        :param args: Reply or Inline Keyboard objects
+        :return:
         """
 
         self.keyboard.append(list(args))
@@ -30,10 +30,10 @@ class ReplyKeyboard(Base):
     def button(text, request_contact=False, request_location=False):
         """
         Returns ReplyKeyboardButton object
-        
+
         :param text: button label
         :param request_contact: if True, button requests user's phone contact
-        :param request_location: if True, button requests user's location request 
+        :param request_location: if True, button requests user's location request
         :return: ReplyKeyboardButton object
         """
 
@@ -47,7 +47,7 @@ class ReplyKeyboard(Base):
         """
         Returns ReplyKeyboard object
         Keyboard array is stored in self.keyboard
-        
+
         :param resize_keyboard: if True, keyboard will be fit to buttons labels
         :param one_time_keyboard: if True, keyboard will be removed after pressing the button
         :param selective: if True, keyboard will be shown only for mentioned users or for user, whose message is under reply
@@ -87,11 +87,11 @@ class InlineKeyboard(Base):
     def button(text, callback_data=None, url=None, switch_inline_query=None, switch_inline_query_current_chat=None):
         """
         Returns InlineKeyboardButton object
-        
+
         :param text: button label
         :param callback_data: data, which will be send as inline query if user press the button
         :param url: url to open when user press the button
-        :param switch_inline_query: if set, requests user to select chat and fill input field with passed data 
+        :param switch_inline_query: if set, requests user to select chat and fill input field with passed data
         :param switch_inline_query_current_chat: if set, fill input field in current chat with passed data
         :return: InlineKeyboardButton object
         """
@@ -116,7 +116,7 @@ class InlineKeyboard(Base):
         """
         Returns InlineKeyboard object
         Keyboard array is stored in self.keyboard
-        
+
         :return: InlineKeyboard object
         """
 
@@ -135,9 +135,9 @@ class ForceReply:
     def get(selective=False):
         """
         Returns ReplyKeyboardRemove object
-        
+
         :param selective: if True, remove keyboard only for mentioned users, or for user, whose message is under reply
-        :return: ReplyKeyboardRemove object 
+        :return: ReplyKeyboardRemove object
         """
 
         return {

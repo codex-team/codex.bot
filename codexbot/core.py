@@ -66,7 +66,7 @@ class Core:
         Collects core modules from subdirectories
         :return:
         """
-        for service in filter(lambda x: not x.startswith('__'), os.listdir('codexbot/services')):
+        for service in filter(lambda x: not x.startswith('.') and not x.startswith('__'), os.listdir('codexbot/services')):
             try:
                 current_service = importlib.import_module("codexbot.services.{}".format(service))
 
