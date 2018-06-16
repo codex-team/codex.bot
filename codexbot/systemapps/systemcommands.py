@@ -57,13 +57,12 @@ class SystemCommand:
             available_apps = [app['name'] for app in self.api.apps.values()]
 
         text = "Available applications:\n\n" + \
-               '\n\n'.join(["*{}* – {}".format(app, self.api.commands.get(app)[0]) for app in available_apps])
+               '\n\n'.join(["/{} – {}".format(app, self.api.commands.get(app, "")[0]) for app in available_apps if app in self.api.commands])
 
         if not len(available_apps):
             text = "There are no available applications"
 
         await messenger_service.send(chat['id'], {
             'text': text,
-            'bot': bot_id,
-            'parse_mode': 'Markdown'
+            'bot': bot_id
         })
