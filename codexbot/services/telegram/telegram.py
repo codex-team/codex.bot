@@ -81,7 +81,8 @@ class Telegram:
             'service': self.__name__,
             'commands': update.get_commands(),
             'text': update.message.text,
-            'bot': update.bot_id
+            'bot': update.bot_id,
+            # 'bot_name': update.bo
         })
 
     async def send_callback_query_to_app(self, update):
