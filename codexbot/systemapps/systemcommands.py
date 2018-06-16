@@ -1,9 +1,12 @@
+import logging
+
+
 class SystemCommand:
     """
     Codex Bot system commands
     """
 
-    def __init__(self, api):
+    def __init__(self, api, core):
 
         self.commands = {
             'start': self.help,
@@ -12,8 +15,20 @@ class SystemCommand:
             'bots': self.bots
         }
         self.api = api
+        self.core = core
 
-    async def help(self, chat, cmd_payload):
+    async def help(self, chat_hash, cmd_payload, bot_id):
+
+        chat = self.core.db.find_one('chats', {'hash': chat_hash})
+        messenger_service = self.core.services[chat['service']]
+
+        if bot_id:
+            bot = self.api.db.find_one(self.api.BOTS_COLLECTION_NAME, {'bot_id': int(bot_id)})
+            if bot:
+                return await messenger_service.send(chat['id'], {
+                    'text': bot.get('help', bot.get('help', 'Help message is not set')),
+                    'bot': bot_id
+                })
 
         text = "Codex Bot is a platform for services integration into messengers\n\n" \
                "To see available applications use /apps\n\n" \
@@ -29,7 +44,7 @@ class SystemCommand:
 
         await self.api.send_to_service('system', message_payload)
 
-    async def apps(self, chat, cmd_payload):
+    async def apps(self, chat, cmd_payload, *args):
 
         text = "Available applications:\n\n"
 
@@ -55,7 +70,7 @@ class SystemCommand:
 
         await self.api.send_to_service('system', message_payload)
 
-    async def bots(self, chat, cmd_payload):
+    async def bots(self, chat, cmd_payload, *args):
         text = "Controlled bots"
 
         message_payload = {
