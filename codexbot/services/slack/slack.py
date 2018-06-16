@@ -157,7 +157,7 @@ class Slack:
                 'status' : 200
             }
 
-    def send(self, chat_id, message_payload):
+    def send(self, chat_id, message_payload, app=None):
         """
         Used by Codex bot core to send message to the required platform
         
