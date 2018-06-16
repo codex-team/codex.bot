@@ -27,7 +27,8 @@ class SystemCommand:
             if bot:
                 return await messenger_service.send(chat['id'], {
                     'text': bot.get('help', bot.get('help', 'Help message is not set')),
-                    'bot': bot_id
+                    'bot': bot_id,
+                    'parse_mode': 'HTML'
                 })
 
         text = "Codex Bot is a platform for services integration into messengers\n\n" \
@@ -38,7 +39,7 @@ class SystemCommand:
                "CodeX Team"
 
         message_payload = {
-            'chat_hash': chat,
+            'chat_hash': chat['hash'],
             'text': text
         }
 
