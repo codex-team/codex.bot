@@ -24,7 +24,7 @@ class Broker:
         self.event_loop = event_loop
         self.api = API(self)
         self.app_manager = Manager(self)
-        self.system_commands = SystemCommand(self.api)
+        self.system_commands = SystemCommand(self.api, self.core)
 
 
     async def callback(self, channel, body, envelope, properties):
@@ -82,8 +82,8 @@ class Broker:
 
             # Handle core-predefined command
             if incoming_cmd['command'] in self.system_commands.commands:
-                if message_data['bot'] is None:
-                    await self.system_commands.commands[incoming_cmd['command']](chat_hash, incoming_cmd['payload'])
+                # if message_data['bot'] is None:
+                await self.system_commands.commands[incoming_cmd['command']](chat_hash, incoming_cmd['payload'], bot_id)
                 return True
 
             command_data = self.api.commands.get(incoming_cmd['command'])

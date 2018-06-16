@@ -115,6 +115,32 @@ class BotManager(ManagerBase):
             })
         else:
             await messenger_service.send(chat['id'], {
-                'text': 'Your bot «{}» is just awesome\nYou can:\n/delbot {} – delete it\n/linkbot {} – configure available applications'.format(bot['name'], bot['name'], bot['name'])
+                'text': 'Your bot «{}» is just awesome\nYou can:\n'
+                        '/delbot {} – delete it\n'
+                        '/linkbot {} – configure available applications\n'
+                        '/sethelp {} <HTML_TEXT> – set help message. It is HTML compatible\n'
+                        .format(*[bot['name']] * 4)
             })
 
+    async def set_help(self, chat_hash, data):
+        chat = self.db.find_one('chats', {'hash': chat_hash})
+        messenger_service = self.core.services[chat['service']]
+
+        try:
+            bot_name, help_text = data.split(' ', 1)
+        except Exception as e:
+            return await messenger_service.send(chat['id'], {
+                'text': 'Usage error. Try /sethelp <BOT_NAME> <HTML_TEXT>'
+            })
+
+        bot = self.db.find_one(self.api.BOTS_COLLECTION_NAME, {'name': bot_name, 'owner': chat_hash})
+        if not bot:
+            await messenger_service.send(chat['id'], {
+                'text': 'Bot {} is undefined'.format(bot_name)
+            })
+        else:
+            bot['help'] = help_text
+            self.db.update(self.api.BOTS_COLLECTION_NAME, {'name': bot_name, 'owner': chat_hash}, bot)
+            await messenger_service.send(chat['id'], {
+                'text': 'Done.'
+            })
