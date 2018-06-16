@@ -97,10 +97,10 @@ class Base:
         """
 
         if keyboard:
-            self.reply_markup['keyboard'] = keyboard['keyboard']
-            self.reply_markup['resize_keyboard'] = keyboard['resize_keyboard']
-            self.reply_markup['one_time_keyboard'] = keyboard['one_time_keyboard']
-            self.reply_markup['selective'] = keyboard['selective']
+            self.reply_markup['keyboard'] = keyboard.get('keyboard')
+            self.reply_markup['resize_keyboard'] = keyboard.get('resize_keyboard', False)
+            self.reply_markup['one_time_keyboard'] = keyboard.get('one_time_keyboard', False)
+            self.reply_markup['selective'] = keyboard.get('selective', False)
         if inline_keyboard:
             self.reply_markup['inline_keyboard'] = inline_keyboard
         if remove_keyboard:
