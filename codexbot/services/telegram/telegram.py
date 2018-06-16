@@ -220,7 +220,7 @@ class Telegram:
 
         try:
             result = requests.get(API_URL + api_token + "/getMe")
-            data = json.loads(result.content)
+            data = json.loads(result.text)
             return data
 
         except Exception as e:
