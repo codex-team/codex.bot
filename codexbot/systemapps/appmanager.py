@@ -29,6 +29,7 @@ class Manager:
             'addbot': self.bot_manager.add_bot,
             'delbot': self.bot_manager.del_bot,
             'linkbot': self.bot_app_manager.link_bot,
+            'sethelp': self.bot_manager.set_help,
             'botmenu': self.bot_manager.bot_menu,
             'applylink': self.bot_app_manager.apply_link,
             'unlink': self.bot_app_manager.unapply_link
