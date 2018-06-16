@@ -72,8 +72,12 @@ class Broker:
             return
 
         bot_id = message_data['bot']
+        bot_data = self.api.bots.get(int(bot_id), None) if bot_id else None
 
         for incoming_cmd in message_data['commands']:
+
+            if bot_id is not None and bot_data is not None and bot_data['data']['name'] in incoming_cmd['command']:
+                incoming_cmd['command'], _ = incoming_cmd['command'].split('@', 1)
 
             if incoming_cmd['command'] in self.app_manager.commands:
                 if bot_id is None:
