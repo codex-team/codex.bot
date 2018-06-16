@@ -11,8 +11,7 @@ class SystemCommand:
         self.commands = {
             'start': self.help,
             'help': self.help,
-            'apps': self.apps,
-            'bots': self.bots
+            'apps': self.apps
         }
         self.api = api
         self.core = core
@@ -45,7 +44,10 @@ class SystemCommand:
 
         await self.api.send_to_service('system', message_payload)
 
-    async def apps(self, chat, cmd_payload, *args):
+    async def apps(self, chat_hash, cmd_payload, bot_id):
+
+        chat = self.core.db.find_one('chats', {'hash': chat_hash})
+        messenger_service = self.core.services[chat['service']]
 
         text = "Available applications:\n\n"
 
@@ -69,14 +71,7 @@ class SystemCommand:
             'text': text
         }
 
-        await self.api.send_to_service('system', message_payload)
-
-    async def bots(self, chat, cmd_payload, *args):
-        text = "Controlled bots"
-
-        message_payload = {
-            'chat_hash': chat,
-            'text': text
-        }
-
-        await self.api.send_to_service('system', message_payload)
+        await messenger_service.send(chat['id'], {
+            'text': text,
+            'bot': bot_id
+        })
