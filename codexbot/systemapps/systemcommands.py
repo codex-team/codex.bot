@@ -49,29 +49,21 @@ class SystemCommand:
         chat = self.core.db.find_one('chats', {'hash': chat_hash})
         messenger_service = self.core.services[chat['service']]
 
-        text = "Available applications:\n\n"
+        if bot_id is not None:
+            bot_name = self.core.db.find_one(self.api.BOTS_COLLECTION_NAME, {'bot_id': int(bot_id)}).get('name', None)
+            bot_apps = [link['app_name'] for link in self.core.db.find(self.api.BOT_APP_LINKS_COLLECTION_NAME, {'bot_name': bot_name})]
+            available_apps = bot_apps
+        else:
+            available_apps = [app['name'] for app in self.api.apps.values()]
 
-        available_apps = []
-
-        for app in self.api.apps:
-
-            command = self.api.apps[app]['name']
-            description, app_token = self.api.commands.get(command, (None, None))
-            if not description:
-                continue
-
-            text += "/{} — {}\n".format(command, description)
-            available_apps.append(command)
+        text = "Available applications:\n\n" + \
+               '\n\n'.join(["*{}* – {}".format(app, self.api.commands.get(app)[0]) for app in available_apps])
 
         if not len(available_apps):
             text = "There are no available applications"
 
-        message_payload = {
-            'chat_hash': chat,
-            'text': text
-        }
-
         await messenger_service.send(chat['id'], {
             'text': text,
-            'bot': bot_id
+            'bot': bot_id,
+            'parse_mode': 'Markdown'
         })
