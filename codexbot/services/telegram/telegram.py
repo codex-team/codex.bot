@@ -198,12 +198,16 @@ class Telegram:
                                               markup.get('force_reply', None))
 
             result = self.message.send(chat_id, message, parse_mode, disable_web_page_preview, bot_token=bot_token, update_id=update_id)
-            want_response = message_payload.get('want_response', False)
+
+            want_response = message_payload.get('want_response')
+            result['result']['want_response'] = want_response
+
+            payload = result['result']
+
             if app and want_response and result:
                 message = json.dumps({
                     'command': 'callback query',
-                    'payload': result['result'],
-                    'want_response': want_response
+                    'payload': payload
                 })
                 await self.broker.add_to_app_queue(message, app['queue'], app['host'])
             return
