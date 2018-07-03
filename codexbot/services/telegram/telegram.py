@@ -116,7 +116,10 @@ class Telegram:
         # Update webhook for hijacked bots
         bots = list(self.broker.core.db.find(self.broker.api.BOTS_COLLECTION_NAME, {}))
         for bot in bots:
-            self.set_webhook(api_token=bot['api_token'])
+            self.set_webhook(
+                api_token=bot['api_token'],
+                callback_url="/telegram/callback/{}".format(bot['bot_id'])
+            )
 
     def set_webhook(self, api_token=None, callback_url=None):
         if not api_token:
