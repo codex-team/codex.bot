@@ -52,6 +52,7 @@ class Broker:
         """
         chat_hash = self.get_chat_hash(message_data)
         user_hash = self.get_user_hash(message_data)
+        bot_id = message_data.get('bot', None)
 
         key = API.get_pending_app_key({'user': user_hash, 'chat': chat_hash})
 
@@ -64,14 +65,13 @@ class Broker:
                 'text': message_data['text'],
                 'chat': chat_hash,
                 'user': user_hash,
-                'bot': message_data.get('bot', None)
+                'bot': bot_id
             }
 
             self.api.reset_pending(self.api.pending_apps[key])
             await self.api.send_command('user answer', payload, app)
             return
 
-        bot_id = message_data['bot']
         bot_data = self.api.bots.get(int(bot_id), None) if bot_id else None
 
         for incoming_cmd in message_data['commands']:
