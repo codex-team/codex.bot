@@ -113,7 +113,7 @@ class Slack:
     @http_response
     async def slack_oauth(self, params):
         """
-        After hand-filling command in api.slack.com/apps, we got verification request wth 'challenge' and 'token'. 
+        After hand-filling command in api.slack.com/apps, we got verification request with 'challenge' and 'token'.
         To verify, pass back 'challenge' field.
         
         Api URL : https://api.slack.com/events/url_verification
@@ -157,7 +157,7 @@ class Slack:
                 'status' : 200
             }
 
-    def send(self, chat_id, message_payload, app=None):
+    async def send(self, chat_id, message_payload, app=None):
         """
         Used by Codex bot core to send message to the required platform
         
