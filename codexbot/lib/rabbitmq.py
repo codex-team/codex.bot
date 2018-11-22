@@ -1,25 +1,16 @@
-import aioamqp
-
-# This file will be copied to every module by bash script during initial setup.
+import aio_pika
 
 async def init_receiver(callback, queue_name, host='localhost'):
-    transport, protocol = await aioamqp.connect()
-    channel = await protocol.channel()
-    await channel.queue_declare(queue_name=queue_name, passive=False, auto_delete=True)
-    await channel.basic_consume(callback, queue_name=queue_name)
+    connection = await aio_pika.connect_robust(host=host)
+    channel = await connection.channel()
+    await channel.set_qos(prefetch_count=1)
+    queue = await channel.declare_queue(queue_name, durable=True)
+    await queue.consume(callback)
 
 
 async def add_message_to_queue(data, queue_name, host='localhost'):
-    transport, protocol = await aioamqp.connect()
-    channel = await protocol.channel()
-
-    await channel.queue_declare(queue_name=queue_name, passive=False, auto_delete=True)
-
-    await channel.basic_publish(
-        payload=data,
-        exchange_name='',
-        routing_key=queue_name
-    )
-
-    await protocol.close()
-    transport.close()
+    connection = await aio_pika.connect_robust(host=host)
+    channel = await connection.channel()
+    message = aio_pika.Message(data.encode(), delivery_mode=aio_pika.DeliveryMode.PERSISTENT)
+    await channel.default_exchange.publish(message, routing_key=queue_name)
+    await connection.close()
