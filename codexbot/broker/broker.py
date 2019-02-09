@@ -41,6 +41,7 @@ class Broker:
             try:
                 logging.debug(" [x] Received %r" % message.body)
                 await self.api.process(message.body.decode("utf-8"))
+                message.ack()
             except Exception as e:
                 logging.error("Broker callback error")
                 logging.error(e)
