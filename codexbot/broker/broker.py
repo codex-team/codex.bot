@@ -3,6 +3,8 @@ import logging
 import random
 import string
 
+from aio_pika import IncomingMessage
+
 from codexbot.globalcfg import RABBITMQ
 from codexbot.lib.rabbitmq import add_message_to_queue, init_receiver
 from codexbot.systemapps.appmanager import Manager
@@ -26,8 +28,7 @@ class Broker:
         self.app_manager = Manager(self)
         self.system_commands = SystemCommand(self.api, self.core)
 
-
-    async def callback(self, channel, body, envelope, properties):
+    async def callback(self, message: IncomingMessage):
         """
         Process all messages from 'core' queue by self.API object
         :param channel:
@@ -36,12 +37,14 @@ class Broker:
         :param properties:
         :return:
         """
-        try:
-            logging.debug(" [x] Received %r" % body)
-            await self.api.process(body.decode("utf-8"))
-        except Exception as e:
-            logging.error("Broker callback error")
-            logging.error(e)
+        with message.process():
+            try:
+                logging.debug(" [x] Received %r" % message.body)
+                await self.api.process(message.body.decode("utf-8"))
+                message.ack()
+            except Exception as e:
+                logging.error("Broker callback error")
+                logging.error(e)
 
     async def commands_to_app(self, message_data):
         """
