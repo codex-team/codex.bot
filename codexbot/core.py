@@ -7,7 +7,7 @@ import gettext
 from codexbot.lib.db import Db
 from codexbot.lib.logging import Logging
 from codexbot.broker.broker import Broker
-from codexbot.globalcfg import SERVER, DB
+from codexbot.globalcfg import SERVER, DB, I18N_LOCATION
 from codexbot.lib.server import Server
 
 
@@ -40,7 +40,7 @@ class Core:
     # TODO создать отдельный модуль для подключения словарей к модулям
     #      но это не точно
     def init_i18n(self):
-        gettext.translation('main', 'i18n', ['ru']).install()
+        gettext.translation('main', I18N_LOCATION, ['ru']).install()
         logging.debug("Initiate i18n.")
 
     def init_queue(self):

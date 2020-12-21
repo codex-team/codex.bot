@@ -1,0 +1,42 @@
+version: "3"
+
+volumes:
+  mongodata:
+
+networks:
+  mongodb_network:
+    driver: bridge
+  rabbitmq_network:
+    driver: bridge
+
+services:
+  # todo: add nginx container
+  bot:
+    build: .
+    depends_on:
+      - mongodb
+      - rabbitmq
+    volumes:
+      - ./cfg/bot/config.yml:/home/bot/config.yml:ro
+      - ./codexbot:/home/bot/codexbot:ro
+      - ./i18n:/home/bot/i18n:ro
+    networks:
+      - mongodb_network
+      - rabbitmq_network
+    environment:
+      BOT_CONFIG_FILE_PATH: "/home/bot/config.yml"
+    ports:
+      - 1337:1337
+    command: "python -m codexbot"
+
+  mongodb:
+    image: mongo:4.2
+    volumes:
+      - mongodata:/data/db
+    networks:
+      - mongodb_network
+
+  rabbitmq:
+    image: rabbitmq:alpine
+    networks:
+      - rabbitmq_network

@@ -1,0 +1,23 @@
+##
+# Main URL for services callbacks
+# Should use https protocol
+##
+URL: "i18n"
+
+# i18n dir location
+I18N_LOCATION: "i18n"
+
+# HTTP server settings
+SERVER:
+    host: "127.0.0.1"
+    port: 1337
+
+# RabbitMQ server settings
+RABBITMQ:
+    host: "rabbitmq"
+
+# DB settings
+DB:
+    name: "default"
+    host: "mongodb"
+    port: 27017
