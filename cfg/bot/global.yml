@@ -2,7 +2,7 @@
 # Main URL for services callbacks
 # Should use https protocol
 ##
-URL: "i18n"
+URL: ""
 
 # i18n dir location
 I18N_LOCATION: "i18n"

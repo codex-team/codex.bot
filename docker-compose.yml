@@ -17,16 +17,19 @@ services:
       - mongodb
       - rabbitmq
     volumes:
-      - ./cfg/bot/config.yml:/home/bot/config.yml:ro
+      - ./cfg/bot/:/home/bot/config:ro
       - ./codexbot:/home/bot/codexbot:ro
       - ./i18n:/home/bot/i18n:ro
     networks:
       - mongodb_network
       - rabbitmq_network
     environment:
-      BOT_CONFIG_FILE_PATH: "/home/bot/config.yml"
+      BOT_CONFIG_FILE_PATH: "/home/bot/config/global.yml"
+      BOT_TELEGRAM_CONFIG_FILE_PATH: "/home/bot/config/telegram/config.yml"
+      BOT_SLACK_CONFIG_FILE_PATH: "/home/bot/config/slack/config.yml"
     ports:
       - 1337:1337
+    restart: on-failure # todo: start bot only after rabbitmq has started
     command: "python -m codexbot"
 
   mongodb:
