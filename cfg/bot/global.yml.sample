@@ -9,7 +9,7 @@ I18N_LOCATION: "i18n"
 
 # HTTP server settings
 SERVER:
-    host: "127.0.0.1"
+    host: "0.0.0.0"
     port: 1337
 
 # RabbitMQ server settings

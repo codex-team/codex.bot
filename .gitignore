@@ -3,5 +3,6 @@
 venv
 **/config.py
 globalcfg.py
+cfg/**/*.yml
 codexbot/.DS_Store
 .DS_Store
