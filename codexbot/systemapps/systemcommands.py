@@ -30,11 +30,14 @@ class SystemCommand:
                     'parse_mode': 'HTML'
                 })
 
-        text = "Codex Bot is a platform for services integration into messengers\n\n" \
-               "To see available applications use /apps\n\n" \
+        text = "Codex Bot is a platform for services integration into messengers\n" \
+               "\n" \
+               "To see available applications use /apps\n" \
+               "\n" \
                "To register new application use /newapp\n" \
-               "To see your applications use /myapps\n\n" \
-               "More information on ifmo.su/bot\n" \
+               "To see your applications use /myapps\n" \
+               "\n" \
+               "More information on codex.so/bot\n" \
                "CodeX Team"
 
         message_payload = {
