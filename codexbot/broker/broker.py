@@ -37,7 +37,7 @@ class Broker:
         :param properties:
         :return:
         """
-        with message.process():
+        with message.process(ignore_processed=True):
             try:
                 logging.debug(" [x] Received %r" % message.body)
                 await self.api.process(message.body.decode("utf-8"))
