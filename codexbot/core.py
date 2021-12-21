@@ -7,7 +7,7 @@ import gettext
 from codexbot.lib.db import Db
 from codexbot.lib.logging import Logging
 from codexbot.broker.broker import Broker
-from codexbot.globalcfg import SERVER, DB
+from codexbot.global_settings import SERVER_HOST, SERVER_PORT, DATABASE_HOST, DATABASE_PORT, DATABASE_NAME
 from codexbot.lib.server import Server
 
 
@@ -33,9 +33,9 @@ class Core:
         parser.add_argument('--port', help="local port")
         args = parser.parse_args()
         if args.host:
-            SERVER['host'] = args.host
+            SERVER_HOST = args.host
         if args.port:
-            SERVER['port'] = int(args.port)
+            SERVER_PORT = int(args.port)
 
     # TODO создать отдельный модуль для подключения словарей к модулям
     #      но это не точно
@@ -48,7 +48,7 @@ class Core:
         self.broker.start()
 
     def init_server(self):
-        self.server = Server(self.event_loop, SERVER['host'], SERVER['port'])
+        self.server = Server(self.event_loop, SERVER_HOST, SERVER_PORT)
 
     def init_broker(self):
         self.broker = Broker(self, self.event_loop)
@@ -58,8 +58,8 @@ class Core:
         Initialize self.db object with 'default' database name
         :return:
         """
-        logging.debug("Initiate DB.")
-        self.db = Db(DB['name'], DB['host'], DB['port'])
+        logging.debug("Initiate DB."+DATABASE_NAME)
+        self.db = Db(DATABASE_NAME, DATABASE_HOST, DATABASE_PORT)
 
     def init_services(self):
         """

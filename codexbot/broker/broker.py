@@ -5,7 +5,7 @@ import string
 
 from aio_pika import IncomingMessage
 
-from codexbot.globalcfg import RABBITMQ
+from codexbot.global_settings import RABBITMQ
 from codexbot.lib.rabbitmq import add_message_to_queue, init_receiver
 from codexbot.systemapps.appmanager import Manager
 from codexbot.systemapps.systemcommands import SystemCommand
@@ -153,7 +153,7 @@ class Broker:
         Receive all messages from 'core' queue to self.callback
         :return:
         """
-        self.event_loop.run_until_complete(init_receiver(self.callback, "core", RABBITMQ['host']))
+        self.event_loop.run_until_complete(init_receiver(self.callback, "core", RABBITMQ))
 
     def get_chat_hash(self, message_data):
         """

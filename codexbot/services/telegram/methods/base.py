@@ -2,7 +2,7 @@ import requests
 import logging
 import json
 
-from codexbot.services.telegram.config import API_URL
+from codexbot.services.telegram.telegram_settings import API_URL
 
 
 def message(function):

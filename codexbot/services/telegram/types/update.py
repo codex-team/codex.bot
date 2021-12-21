@@ -1,7 +1,7 @@
 from json import loads
 from .message import Message
 from .callbackquery import CallbackQuery
-from ..config import BOT_NAME
+from ..telegram_settings import BOT_NAME
 
 
 class Update:
