@@ -1,0 +1,45 @@
+version: "3.4"
+services:
+  mongodb:
+    image: mongo:4.4
+    volumes:
+      - botcoremongodata:/data/db
+    ports:
+      - "127.0.0.1:27017:27017"
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongo 127.0.0.1:27017/test --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq
+    ports:
+      - "127.0.0.1:5672:5672"
+      - "127.0.0.1:15672:15672"
+    healthcheck:
+      test: [ "CMD", "nc", "-z", "127.0.0.1", "5672" ]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
+  codex-bot-core:
+    build:
+      dockerfile: Dockerfile
+      context: .
+    command: python main.py
+    restart: on-failure
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    volumes:
+      - .:/home/app/
+    ports:
+      - "127.0.0.1:1337:1337"
+
+volumes:
+  botcoremongodata:
