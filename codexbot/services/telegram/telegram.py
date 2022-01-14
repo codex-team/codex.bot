@@ -4,9 +4,9 @@ from urllib.parse import urlencode
 
 import requests
 
-from codexbot.globalcfg import URL
+from codexbot.global_settings import URL
 from codexbot.lib.server import http_response
-from .config import BOT_NAME, API_TOKEN, API_URL, CALLBACK_ROUTE
+from .telegram_settings import BOT_NAME, API_TOKEN, API_URL, CALLBACK_ROUTE
 from .methods.message import Message
 from .types.message import Message as MessageType
 from .methods.photo import Photo

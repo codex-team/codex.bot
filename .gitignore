@@ -5,3 +5,4 @@ venv
 globalcfg.py
 codexbot/.DS_Store
 .DS_Store
+.env

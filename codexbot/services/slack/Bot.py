@@ -1,7 +1,7 @@
 import logging
 
 from slackclient import SlackClient
-from codexbot.services.slack.config.config import BOT_NAME, CLIENT_ID, CLIENT_SECRET, VERIFICATION
+from codexbot.services.slack.slack_settings import BOT_NAME, CLIENT_ID, CLIENT_SECRET
 
 authed_teams = {}
 
