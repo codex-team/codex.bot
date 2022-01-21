@@ -3,7 +3,7 @@ name: Build and push docker image
 on: [push]
 
 env:
-  DOCKER_REPO: ${{ secrets.DOCKER_USERNAME }}/codex-bot-core
+  DOCKER_REPO: codex-team/codex-bot-core
 
 jobs:
   build:
