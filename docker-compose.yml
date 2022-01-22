@@ -7,35 +7,29 @@ services:
     ports:
       - "27017:27017"
   rabbitmq:
-        image: rabbitmq:3-management-alpine
-        container_name: rabbitmq
-        ports:
-          - 5672:5672
-          - 15672:15672
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
   codex-bot:
     build:
       dockerfile: Dockerfile
       context: .
     command: python main.py
-    volumes:
-      - .:/home/app/
     ports:
-      - 1337:1337
+      - "1337:1337"
   notify:
     build:
       dockerfile: ../notify/Dockerfile
       context: ../notify
-    command: python main.py
-    volumes:
-      - ../notify/notify:/home/notify
+    command: python ./notify/main.py
     ports:
-      - 1339:1339
+      - "1339:1339"
   github:
     build:
       dockerfile: ../github/Dockerfile
       context: ../github
-    command: python main.py
-    volumes:
-      - ../github/github:/home/github
+    command: python ./github/main.py
     ports:
-      - 1333:1333
+      - "1333:1333"
