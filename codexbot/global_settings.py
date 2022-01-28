@@ -10,7 +10,7 @@ URL = os.environ.get("URL")
 SERVER_HOST = os.environ.get("SERVER_HOST")
 SERVER_PORT = int(os.environ.get("SERVER_PORT"))
 
-RABBITMQ = os.environ.get("RABBITMQ_HOST")
+RABBITMQ = os.environ.get("RABBITMQ_URL")
 
 DATABASE_NAME = os.environ.get("DATABASE_NAME")
 DATABASE_HOST = os.environ.get("DATABASE_HOST")
