@@ -9,4 +9,4 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
-ENTRYPOINT ['python', 'main.py']
+CMD ["python", "main.py"]
