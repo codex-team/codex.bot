@@ -33,3 +33,10 @@ services:
     command: python ./github/main.py
     ports:
       - "1333:1333"
+  metrika:
+    build:
+      dockerfile: ../metrika/Dockerfile
+      context: ../metrika
+    command: python ./metrika/main.py
+    ports:
+      - "1334:1334"
