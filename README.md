@@ -1,4 +1,4 @@
-# [@codex_bot](https://ifmo.su/bot)
+# [@codex_bot](https://codex.so/bot)
 Platform for integration of services into messengers. It's simple. Applications written with [our SDK](https://github.com/codex-bot/sdk-python) will be available in all supported messengers.
 
 ## Messengers
@@ -32,7 +32,7 @@ Useful integration with github.com. Provides notifications about
 #### Usage
 Type `/github_start` and follow instructions to add a new repository.
 
-![](https://capella.pics/de15cea7-d234-4ddb-9923-c76fa0ec803a)
+![](./images/de15cea7-d234-4ddb-9923-c76fa0ec803a.jpeg)
 
 ### Yandex.Metrica
 https://github.com/codex-bot/metrika
@@ -47,7 +47,7 @@ Get regular or instant reports with analytics data from Yandex.
 - `/metrika_counters` — list of added counters
 - `/metrika_access` — remove user from the chat
 
-![](https://capella.pics/52a46a39-4573-4597-a0a1-9ac6d7e87120)
+![](./images/52a46a39-4573-4597-a0a1-9ac6d7e87120.jpeg)
 
 ### Webhooks
 https://github.com/codex-bot/Webhooks
@@ -60,7 +60,7 @@ Easy-to-setup notifications scheme. You will get a special link that allows to s
 
 Example:
 ```bash
-curl -X POST https://notify.bot.ifmo.su/u/ABCD1234 -d "message=Hello world"
+curl -X POST https://notify.bot.codex.so/u/ABCD1234 -d "message=Hello world"
 ```
 
 ![demo](https://user-images.githubusercontent.com/15448200/29435981-1c1e223e-83b2-11e7-8ee0-a3568b40ed7b.gif "You'll get a Hello world message in the telegram chat")
@@ -77,7 +77,7 @@ Subscribe to your favorite feeds and get notifications with updates.
 - `/rssparser_get` — check your feed for updates
 - `/rssparser_remove <URL>` — unsubscribe from the feed
 
-![](https://capella.pics/0f595425-82e6-4793-a342-875b189f05d8)
+![](./images/0f595425-82e6-4793-a342-875b189f05d8.jpeg)
 
 ### Weather
 https://github.com/codex-bot/weather
@@ -89,7 +89,7 @@ Allows you to be informed about weather conditions in your region via Telegram c
 - `/cities` — view cities list
 - `/weather` — get current weather conditions
 
-![](https://capella.pics/3ee93508-ef47-4c61-9c2f-988e2e6d9b93)
+![](./images/3ee93508-ef47-4c61-9c2f-988e2e6d9b93.jpeg)
 
 ## Issues and improvements
 
@@ -98,4 +98,4 @@ Allows you to be informed about weather conditions in your region via Telegram c
 
 ## About CodeX
 
-We are a small team of passionate web-developers represented by students and graduates of IFMO University located in St. Petersburg, Russia. Fell free to give us a feedback on  [team@ifmo.su](mailto:team@ifmo.su)
+We are a small team of passionate web-developers represented by students and graduates of ITMO University located in St. Petersburg, Russia. Fell free to give us a feedback on  [team@codex.so](mailto:team@codex.so)
