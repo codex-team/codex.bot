@@ -62,10 +62,10 @@ class Telegram:
         }
 
     async def send_message_to_app(self, update):
-        if update.message.user.username:
-            username = update.message.user.username
+        if update.message['from'].username:
+            username = update.message['from'].username
         else:
-            username = update.message.user.first_name
+            username = update.message['from'].first_name
 
         # Pass commands from message data to broker
         await self.broker.commands_to_app({
@@ -74,9 +74,9 @@ class Telegram:
                 'type': update.message.chat.type
             },
             'user': {
-                'id': update.message.user.id,
+                'id': update.message['from'].id,
                 'username': username,
-                'lang': update.message.user.language_code
+                'lang': update.message['from'].language_code
             },
             'service': self.__name__,
             'commands': update.get_commands(),
