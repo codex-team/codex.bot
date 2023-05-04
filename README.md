@@ -1,4 +1,7 @@
 # [@codex_bot](https://codex.so/bot)
+
+![](https://flat.badgen.net/github/tag/codex-team/codex.bot)
+
 Platform for integration of services into messengers. It's simple. Applications written with [our SDK](https://github.com/codex-bot/sdk-python) will be available in all supported messengers.
 
 ## Messengers
