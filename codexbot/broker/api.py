@@ -2,6 +2,7 @@ import json
 import random
 import string
 
+from ..lib import metrics
 from ..lib.logging import Logging
 import logging
 
@@ -230,6 +231,11 @@ class API:
         if not chat:
             await self.send_message(self.broker.WRONG, 'Error', current_app)
             return
+
+        metrics.messages_sent.labels(
+            app=current_app['name'] if current_app else 'unknown',
+            chat=chat_hash
+        ).inc()
 
         await self.broker.core.services[chat['service']].send(chat['id'], message_payload, app=current_app)
 
