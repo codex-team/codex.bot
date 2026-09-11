@@ -234,6 +234,28 @@ class Telegram:
             self.photo.send(chat_id, photo, caption, bot_token=bot_token, update_id=update_id)
             return
 
+    def get_chat(self, chat_id):
+        """
+        Read chat meta from Telegram. Returns an empty dict when the chat is gone.
+        """
+        try:
+            result = requests.get(self.__api_url + 'getChat', params={'chat_id': chat_id})
+            data = json.loads(result.text)
+        except Exception as e:
+            logging.debug(e)
+            return {}
+
+        if not data.get('ok'):
+            logging.debug('getChat failed for {}: {}'.format(chat_id, data))
+            return {}
+
+        chat = data['result']
+
+        return {
+            'title': chat.get('title') or chat.get('username') or chat.get('first_name'),
+            'username': chat.get('username')
+        }
+
     def getMe(self, api_token=None):
         if not api_token:
             api_token = self.__token

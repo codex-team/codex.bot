@@ -20,6 +20,12 @@ telegram_rate_limited = Counter(
     ['method']
 )
 
+chat_info = Gauge(
+    'codexbot_chat_info',
+    'Title and type of a chat, labelled by its messenger id',
+    ['chat', 'title', 'type']
+)
+
 last_send_success = Gauge(
     'codexbot_last_send_success_timestamp_seconds',
     'Unix time of the last successful Telegram API call'

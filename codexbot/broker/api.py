@@ -234,8 +234,14 @@ class API:
 
         metrics.messages_sent.labels(
             app=current_app['name'] if current_app else 'unknown',
-            chat=chat_hash
+            chat=str(chat['id'])
         ).inc()
+
+        metrics.chat_info.labels(
+            chat=str(chat['id']),
+            title=chat.get('title') or '',
+            type=chat.get('type') or ''
+        ).set(1)
 
         await self.broker.core.services[chat['service']].send(chat['id'], message_payload, app=current_app)
 
