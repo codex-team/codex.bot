@@ -1,7 +1,9 @@
 import requests
 import logging
 import json
+import time
 
+from codexbot.lib import metrics
 from codexbot.services.telegram.telegram_settings import API_URL
 
 
@@ -62,9 +64,16 @@ def message(function):
 
         self.clear_reply_markup()
 
+        metrics.telegram_api_requests.labels(method=data['method'], code=result.status_code).inc()
+
+        if result.status_code == 429:
+            metrics.telegram_rate_limited.labels(method=data['method']).inc()
+
         if result.status_code != 200:
             logging.debug('Error while sending Telegram message: {}'.format(result.content))
             return False
+
+        metrics.last_send_success.set(time.time())
 
         try:
             return json.loads(result.text)

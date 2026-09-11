@@ -62,10 +62,17 @@ class Telegram:
         }
 
     async def send_message_to_app(self, update):
-        if update.message.user.username:
-            username = update.message.user.username
+        author = update.message.user
+
+        if author:
+            user_id = author.id
+            username = author.username or author.first_name
+            lang = author.language_code
         else:
-            username = update.message.user.first_name
+            # Channel posts have no author, Chat keeps the channel title in first_name
+            user_id = update.message.chat.id
+            username = update.message.chat.first_name
+            lang = None
 
         # Pass commands from message data to broker
         await self.broker.commands_to_app({
@@ -74,9 +81,9 @@ class Telegram:
                 'type': update.message.chat.type
             },
             'user': {
-                'id': update.message.user.id,
+                'id': user_id,
                 'username': username,
-                'lang': update.message.user.language_code
+                'lang': lang
             },
             'service': self.__name__,
             'commands': update.get_commands(),
@@ -226,6 +233,28 @@ class Telegram:
                 caption = message_payload['caption']
             self.photo.send(chat_id, photo, caption, bot_token=bot_token, update_id=update_id)
             return
+
+    def get_chat(self, chat_id):
+        """
+        Read chat meta from Telegram. Returns an empty dict when the chat is gone.
+        """
+        try:
+            result = requests.get(self.__api_url + 'getChat', params={'chat_id': chat_id})
+            data = json.loads(result.text)
+        except Exception as e:
+            logging.debug(e)
+            return {}
+
+        if not data.get('ok'):
+            logging.debug('getChat failed for {}: {}'.format(chat_id, data))
+            return {}
+
+        chat = data['result']
+
+        return {
+            'title': chat.get('title') or chat.get('username') or chat.get('first_name'),
+            'username': chat.get('username')
+        }
 
     def getMe(self, api_token=None):
         if not api_token:

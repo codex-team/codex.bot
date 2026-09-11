@@ -168,13 +168,18 @@ class Broker:
         if not chat:
             chat_hash = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(8))
 
+            service = self.core.services.get(message_data['service'])
+            meta = service.get_chat(message_data['chat']['id']) if hasattr(service, 'get_chat') else {}
+
             self.core.db.insert(
                 'chats',
                 {
                     'id': message_data['chat']['id'],
                     'type': message_data['chat']['type'],
                     'hash': chat_hash,
-                    'service': message_data['service']
+                    'service': message_data['service'],
+                    'title': meta.get('title'),
+                    'username': meta.get('username')
                 }
             )
         else:

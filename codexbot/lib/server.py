@@ -1,5 +1,7 @@
 import aiohttp.web
 
+from .metrics import metrics_handler
+
 
 def http_response(function):
     async def wrapper(self, request):
@@ -38,6 +40,7 @@ class Server:
         self.event_loop = event_loop
         self.host, self.port = host, port
         self.web_server = aiohttp.web.Application(loop=self.event_loop)
+        self.web_server.router.add_get('/metrics', metrics_handler)
 
     def set_routes(self, routes):
         """
